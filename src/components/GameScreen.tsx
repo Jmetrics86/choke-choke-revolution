@@ -1,0 +1,292 @@
+import React, { useEffect, useState, useRef } from 'react';
+import { SongBlueprint, FighterStyle, MatchState, DDRDirection } from '../types/game';
+import { DojoCanvas, DojoCanvasRef } from './DojoCanvas';
+import { audio } from '../utils/AudioEngine';
+import { grappling } from '../utils/GrapplingEngine';
+
+interface GameScreenProps {
+  song: SongBlueprint;
+  fighter: FighterStyle;
+  onExit: () => void;
+  calibrationOffset: number;
+}
+
+export const GameScreen: React.FC<GameScreenProps> = ({
+  song,
+  fighter,
+  onExit,
+  calibrationOffset,
+}) => {
+  const [matchState, setMatchState] = useState<MatchState>({
+    position: 'guard',
+    submission: 'none',
+    isPlayerAttacking: true,
+    chokeMeter: 50, // 50 is center stalemate
+    comboCount: 0,
+    maxCombo: 0,
+    score: 0,
+    currentNoteIndex: 0,
+    gameStatus: 'playing',
+    selectedSongId: song.id,
+    calibrationOffset,
+  });
+
+  const [coachMsg, setCoachMsg] = useState<string>("Breathe. Frame. Watch his posture.");
+  const [activeButton, setActiveButton] = useState<DDRDirection | null>(null);
+  const canvasRef = useRef<DojoCanvasRef>(null);
+
+  // Start synthesizing the song when screen loads
+  useEffect(() => {
+    // Reset song notes hit status
+    song.notes.forEach((n) => {
+      n.hit = false;
+      n.hitResult = null;
+    });
+
+    audio.init().then(() => {
+      audio.play(song);
+      audio.speakCoach(`Let's grapple! Respect the tap.`);
+    });
+
+    return () => {
+      audio.stop();
+    };
+  }, [song]);
+
+  // Handle a timed note Hit
+  const handleNoteHit = (direction: DDRDirection, scoreAdd: number, result: 'perfect' | 'great' | 'ok') => {
+    audio.playSFX(result); // Play dynamic hits SFX!
+    setMatchState((prev) => {
+      const nextCombo = prev.comboCount + 1;
+      const nextMaxCombo = Math.max(prev.maxCombo, nextCombo);
+      const nextScore = prev.score + scoreAdd;
+
+      // Register hit in BJJ state machine
+      const { nextState, message } = grappling.registerHit(direction, {
+        ...prev,
+        comboCount: nextCombo,
+        maxCombo: nextMaxCombo,
+        score: nextScore,
+      });
+
+      if (message) {
+        setCoachMsg(message);
+      }
+
+      return nextState;
+    });
+  };
+
+  // Handle a Miss / Ghost tap
+  const handleNoteMiss = () => {
+    setMatchState((prev) => {
+      // Register miss in BJJ state machine
+      const { nextState, message } = grappling.registerMiss(prev);
+
+      if (message) {
+        setCoachMsg(message);
+      }
+
+      return nextState;
+    });
+  };
+
+  // Virtual mobile touch pad triggers
+  const handleMobileTouch = (direction: DDRDirection) => {
+    setActiveButton(direction);
+    setTimeout(() => setActiveButton(null), 100);
+  };
+
+  const restartMatch = () => {
+    setMatchState({
+      position: 'guard',
+      submission: 'none',
+      isPlayerAttacking: true,
+      chokeMeter: 50,
+      comboCount: 0,
+      maxCombo: 0,
+      score: 0,
+      currentNoteIndex: 0,
+      gameStatus: 'playing',
+      selectedSongId: song.id,
+      calibrationOffset,
+    });
+    setCoachMsg("Match restarted! Protect your neck.");
+    song.notes.forEach((n) => {
+      n.hit = false;
+      n.hitResult = null;
+    });
+    audio.stop();
+    audio.play(song);
+  };
+
+  // Convert position IDs to pretty labels
+  const getPositionLabel = (pos: string) => {
+    switch (pos) {
+      case 'guard': return '🥋 Closed Guard (Neutral)';
+      case 'side_control': return '🤼 Side Control (Advantage)';
+      case 'mount': return '🌋 Full Mount (Dominant)';
+      case 'back_control': return '🎒 Back Control (Summit)';
+      default: return '';
+    }
+  };
+
+  return (
+    <div className="app-container" style={{ background: '#07080b' }}>
+      
+      {/* ─── HUD TOP BAR ─── */}
+      <div className="dojo-header" style={{ borderBottomColor: 'var(--neon-pink)' }}>
+        <h1 className="logo-text" style={{ fontSize: '15px' }}>
+          CCR 🥋 <span>{song.title}</span>
+        </h1>
+        <div className="coach-box" style={{ maxWidth: '65%', fontSize: '10px' }}>
+          Coach: {coachMsg}
+        </div>
+      </div>
+
+      {/* ─── DYNAMIC CHOKE-O-METER ─── */}
+      <div style={{ padding: '8px 15px', background: '#0e0f14', borderBottom: '1px solid #1e2937' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px', marginBottom: '4px', textTransform: 'uppercase' }}>
+          <span style={{ color: 'var(--neon-cyan)', fontWeight: 'bold' }}>Opponent Squeezing (Tap Him!)</span>
+          <span style={{ color: 'var(--neon-pink)', fontWeight: 'bold' }}>You Choked (Escape!)</span>
+        </div>
+        <div style={{ position: 'relative', height: '18px', background: '#1c1e29', borderRadius: '9px', overflow: 'hidden', border: '1px solid #2d3142' }}>
+          {/* Squeeze Zone Gradient */}
+          <div style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            width: '100%',
+            height: '100%',
+            background: 'linear-gradient(to right, var(--neon-cyan) 0%, var(--neon-purple) 50%, var(--neon-pink) 100%)',
+            opacity: 0.25
+          }} />
+          
+          {/* Neutral Marker Center */}
+          <div style={{ position: 'absolute', left: '50%', top: 0, width: '2px', height: '100%', background: 'rgba(255,255,255,0.4)' }} />
+          
+          {/* Dynamic Slider Indicator */}
+          <div style={{
+            position: 'absolute',
+            left: `${matchState.chokeMeter}%`,
+            top: 0,
+            width: '10px',
+            height: '100%',
+            background: matchState.chokeMeter > 55 ? 'var(--neon-pink)' : matchState.chokeMeter < 45 ? 'var(--neon-cyan)' : '#ffffff',
+            borderRadius: '5px',
+            transform: 'translateX(-50%)',
+            boxShadow: '0 0 8px #fff',
+            transition: 'left 0.1s ease-out'
+          }} />
+        </div>
+      </div>
+
+      {/* ─── GAMEPLAY SECTION (ANIMATION + CANVAS) ─── */}
+      <div className="gameplay-layout">
+        
+        {/* Dynamic Canvas wrapper */}
+        <div className="animation-panel" style={{ flex: 1, borderRight: 'none' }}>
+          <DojoCanvas
+            ref={canvasRef}
+            song={song}
+            fighter={fighter}
+            matchState={matchState}
+            onNoteHit={handleNoteHit}
+            onNoteMiss={handleNoteMiss}
+            onTriggerMobileTouch={handleMobileTouch}
+          />
+          
+          {/* Stat panel overlay inside canvas */}
+          <div style={{
+            position: 'absolute',
+            top: '15px',
+            left: '15px',
+            background: 'rgba(11, 12, 16, 0.8)',
+            padding: '10px',
+            borderRadius: '6px',
+            border: '1px solid #1e2937',
+            fontSize: '11px',
+            pointerEvents: 'none'
+          }}>
+            <div style={{ color: 'var(--text-muted)' }}>POSITION: <span style={{ color: '#fff', fontWeight: 'bold' }}>{getPositionLabel(matchState.position)}</span></div>
+            <div style={{ color: 'var(--text-muted)', marginTop: '4px' }}>SCORE: <span style={{ color: 'var(--neon-yellow)', fontWeight: 'bold' }}>{matchState.score}</span></div>
+            <div style={{ color: 'var(--text-muted)', marginTop: '4px' }}>COMBO: <span style={{ color: 'var(--neon-cyan)', fontWeight: 'bold' }}>{matchState.comboCount}</span></div>
+          </div>
+        </div>
+      </div>
+
+      {/* ─── MOBILE FRIENDLY TOUCH BUTTONS OVERLAY ─── */}
+      <div className="mobile-touchpad">
+        <div 
+          className="touch-btn left-btn" 
+          onTouchStart={() => canvasRef.current?.handleHitAttempt('left')}
+          onClick={() => canvasRef.current?.handleHitAttempt('left')}
+          style={{ background: activeButton === 'left' ? 'rgba(255, 0, 85, 0.25)' : 'transparent' }}
+        >
+          <div className="touch-icon left-color">←</div>
+          <div className="touch-label left-color">Shrimp</div>
+        </div>
+        <div 
+          className="touch-btn down-btn" 
+          onTouchStart={() => canvasRef.current?.handleHitAttempt('down')}
+          onClick={() => canvasRef.current?.handleHitAttempt('down')}
+          style={{ background: activeButton === 'down' ? 'rgba(0, 245, 212, 0.25)' : 'transparent' }}
+        >
+          <div className="touch-icon down-color">↓</div>
+          <div className="touch-label down-color">Sprawl</div>
+        </div>
+        <div 
+          className="touch-btn up-btn" 
+          onTouchStart={() => canvasRef.current?.handleHitAttempt('up')}
+          onClick={() => canvasRef.current?.handleHitAttempt('up')}
+          style={{ background: activeButton === 'up' ? 'rgba(57, 255, 20, 0.25)' : 'transparent' }}
+        >
+          <div className="touch-icon up-color">↑</div>
+          <div className="touch-label up-color">Posture</div>
+        </div>
+        <div 
+          className="touch-btn right-btn" 
+          onTouchStart={() => canvasRef.current?.handleHitAttempt('right')}
+          onClick={() => canvasRef.current?.handleHitAttempt('right')}
+          style={{ background: activeButton === 'right' ? 'rgba(255, 234, 0, 0.25)' : 'transparent' }}
+        >
+          <div className="touch-icon right-color">→</div>
+          <div className="touch-label right-color">Sweep</div>
+        </div>
+      </div>
+
+      {/* ─── VICTORY STATE MODAL OVERLAY ─── */}
+      {matchState.gameStatus === 'victory' && (
+        <div className="overlay-screen">
+          <h2 className="overlay-title victory-title">OPPONENT TAPPED!</h2>
+          <p style={{ color: 'var(--neon-green)', fontWeight: 'bold', fontSize: '14px', marginBottom: '20px' }}>
+            Submission Secured. Excellent technique!
+          </p>
+          <div className="overlay-stat">Final Score: <span>{matchState.score}</span></div>
+          <div className="overlay-stat">Max Combo: <span>{matchState.maxCombo}</span></div>
+          <div className="overlay-buttons">
+            <button className="arc-btn cyan-btn" onClick={restartMatch}>Grapple Again</button>
+            <button className="option-btn" onClick={onExit} style={{ border: '1px solid #4a5568' }}>Return to Dojo</button>
+          </div>
+        </div>
+      )}
+
+      {/* ─── GAMEOVER STATE MODAL OVERLAY ─── */}
+      {matchState.gameStatus === 'gameover' && (
+        <div className="overlay-screen">
+          <h2 className="overlay-title gameover-title">TAP OUT!</h2>
+          <p style={{ color: 'var(--neon-pink)', fontWeight: 'bold', fontSize: '14px', marginBottom: '20px' }}>
+            The choke was locked deep. Protect your neck!
+          </p>
+          <div className="overlay-stat">Final Score: <span>{matchState.score}</span></div>
+          <div className="overlay-stat">Max Combo: <span>{matchState.maxCombo}</span></div>
+          <div className="overlay-buttons">
+            <button className="arc-btn" onClick={restartMatch}>Retry Match</button>
+            <button className="option-btn" onClick={onExit} style={{ border: '1px solid #4a5568' }}>Return to Dojo</button>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+};
