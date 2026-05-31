@@ -61,7 +61,7 @@ export const App: React.FC = () => {
   // Trigger sound engine unlock on first interaction
   const unlockAudio = async () => {
     await audio.init();
-    audio.playSFX('perfect');
+    audio.playSFX('oss');
   };
 
   return (

@@ -54,7 +54,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   }, [song]);
 
   // Handle a timed note Hit
-  const handleNoteHit = (direction: DDRDirection, scoreAdd: number, result: 'perfect' | 'great' | 'ok') => {
+  const handleNoteHit = (direction: DDRDirection, scoreAdd: number, result: 'oss' | 'good' | 'meh') => {
     audio.playSFX(result); // Play dynamic hits SFX!
     setMatchState((prev) => {
       const nextCombo = prev.comboCount + 1;
@@ -120,17 +120,6 @@ export const GameScreen: React.FC<GameScreenProps> = ({
     audio.play(song);
   };
 
-  // Convert position IDs to pretty labels
-  const getPositionLabel = (pos: string) => {
-    switch (pos) {
-      case 'guard': return '🥋 Closed Guard (Neutral)';
-      case 'side_control': return '🤼 Side Control (Advantage)';
-      case 'mount': return '🌋 Full Mount (Dominant)';
-      case 'back_control': return '🎒 Back Control (Summit)';
-      default: return '';
-    }
-  };
-
   return (
     <div className="app-container" style={{ background: '#07080b' }}>
       
@@ -182,38 +171,15 @@ export const GameScreen: React.FC<GameScreenProps> = ({
       </div>
 
       {/* ─── GAMEPLAY SECTION (ANIMATION + CANVAS) ─── */}
-      <div className="gameplay-layout">
-        
-        {/* Dynamic Canvas wrapper */}
-        <div className="animation-panel" style={{ flex: 1, borderRight: 'none' }}>
-          <DojoCanvas
-            ref={canvasRef}
-            song={song}
-            fighter={fighter}
-            matchState={matchState}
-            onNoteHit={handleNoteHit}
-            onNoteMiss={handleNoteMiss}
-            onTriggerMobileTouch={handleMobileTouch}
-          />
-          
-          {/* Stat panel overlay inside canvas */}
-          <div style={{
-            position: 'absolute',
-            top: '15px',
-            left: '15px',
-            background: 'rgba(11, 12, 16, 0.8)',
-            padding: '10px',
-            borderRadius: '6px',
-            border: '1px solid #1e2937',
-            fontSize: '11px',
-            pointerEvents: 'none'
-          }}>
-            <div style={{ color: 'var(--text-muted)' }}>POSITION: <span style={{ color: '#fff', fontWeight: 'bold' }}>{getPositionLabel(matchState.position)}</span></div>
-            <div style={{ color: 'var(--text-muted)', marginTop: '4px' }}>SCORE: <span style={{ color: 'var(--neon-yellow)', fontWeight: 'bold' }}>{matchState.score}</span></div>
-            <div style={{ color: 'var(--text-muted)', marginTop: '4px' }}>COMBO: <span style={{ color: 'var(--neon-cyan)', fontWeight: 'bold' }}>{matchState.comboCount}</span></div>
-          </div>
-        </div>
-      </div>
+      <DojoCanvas
+        ref={canvasRef}
+        song={song}
+        fighter={fighter}
+        matchState={matchState}
+        onNoteHit={handleNoteHit}
+        onNoteMiss={handleNoteMiss}
+        onTriggerMobileTouch={handleMobileTouch}
+      />
 
       {/* ─── MOBILE FRIENDLY TOUCH BUTTONS OVERLAY ─── */}
       <div className="mobile-touchpad">

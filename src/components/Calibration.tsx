@@ -14,7 +14,7 @@ export const Calibration: React.FC<CalibrationProps> = ({ currentOffset, onSaveO
   // Audio reference beep
   const handleTestBeep = async () => {
     await audio.init();
-    audio.playSFX('perfect');
+    audio.playSFX('oss');
     
     // Log tap times to help calculate latency offset
     const now = performance.now();

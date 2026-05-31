@@ -6,7 +6,7 @@ interface DojoCanvasProps {
   song: SongBlueprint | null;
   fighter: FighterStyle;
   matchState: MatchState;
-  onNoteHit: (direction: DDRDirection, scoreAdd: number, result: 'perfect' | 'great' | 'ok') => void;
+  onNoteHit: (direction: DDRDirection, scoreAdd: number, result: 'oss' | 'good' | 'meh') => void;
   onNoteMiss: () => void;
   onTriggerMobileTouch: (direction: DDRDirection) => void;
 }
@@ -33,36 +33,57 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
   onTriggerMobileTouch,
 }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [dimensions, setDimensions] = useState({ width: 400, height: 600 });
-  const floatingTextsRef = useRef<FloatingText[]>([]);
+  const fighterCanvasRef = useRef<HTMLCanvasElement>(null);
+  const rhythmCanvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Expose the handleHitAttempt function so that parent screens can trigger it from mobile buttons
+  const [fighterDim, setFighterDim] = useState({ width: 400, height: 250 });
+  const [rhythmDim, setRhythmDim] = useState({ width: 380, height: 500 });
+  
+  const floatingTextsRef = useRef<FloatingText[]>([]);
+  const matchStateRef = useRef<MatchState>(matchState);
+
+  // Keep latest state in ref to avoid re-binding loops
+  useEffect(() => {
+    matchStateRef.current = matchState;
+  }, [matchState]);
+
+  // Expose the handleHitAttempt function so parent screen can call it via ref
   useImperativeHandle(ref, () => ({
     handleHitAttempt(direction: DDRDirection) {
       handleHitAttempt(direction);
     }
   }));
 
-  // Keep latest state in ref to avoid re-binding event listeners
-  const matchStateRef = useRef<MatchState>(matchState);
+  // Resize handler to individually scale both canvases based on their parents
   useEffect(() => {
-    matchStateRef.current = matchState;
-  }, [matchState]);
+    if (!containerRef.current || !fighterCanvasRef.current || !rhythmCanvasRef.current) return;
 
-  // Handle resizing dynamically
-  useEffect(() => {
-    if (!containerRef.current || !canvasRef.current) return;
-
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (let entry of entries) {
-        const { width, height } = entry.contentRect;
-        setDimensions({ width, height });
+    const measureAndResize = () => {
+      if (fighterCanvasRef.current && rhythmCanvasRef.current) {
+        const fRect = fighterCanvasRef.current.parentElement?.getBoundingClientRect();
+        const rRect = rhythmCanvasRef.current.parentElement?.getBoundingClientRect();
+        if (fRect) {
+          setFighterDim({ width: fRect.width, height: fRect.height });
+        }
+        if (rRect) {
+          setRhythmDim({ width: rRect.width, height: rRect.height });
+        }
       }
+    };
+
+    const resizeObserver = new ResizeObserver(() => {
+      measureAndResize();
     });
 
     resizeObserver.observe(containerRef.current);
-    return () => resizeObserver.disconnect();
+    
+    // Initial measure trigger with slight delay to ensure browser layout is stable
+    const timer = setTimeout(measureAndResize, 150);
+
+    return () => {
+      resizeObserver.disconnect();
+      clearTimeout(timer);
+    };
   }, []);
 
   // Keyboard controls listener (Desktop support)
@@ -78,43 +99,51 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
 
       if (direction) {
         e.preventDefault();
-        onTriggerMobileTouch(direction); // Reuse same processing path
+        onTriggerMobileTouch(direction); // Flashes virtual buttons
         handleHitAttempt(direction);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [song]);
+  }, [song, rhythmDim]);
 
   // Attempt to hit scrolling note on keyboard press or mobile tap
   const handleHitAttempt = (direction: DDRDirection) => {
     if (!song) return;
     const songTime = audio.getCurrentTime(matchStateRef.current.calibrationOffset);
+    const targetY = rhythmDim.height - 110;
 
     // Find the earliest unhit note in the correct direction
-    const note = song.notes.find((n) => !n.hit && n.direction === direction && Math.abs(n.time - songTime) < 0.20);
+    const note = song.notes.find(
+      (n) => !n.hit && n.direction === direction && Math.abs(n.time - songTime) < 0.20
+    );
 
     if (note) {
       const diff = Math.abs(note.time - songTime);
       note.hit = true;
 
-      let result: 'perfect' | 'great' | 'ok' = 'ok';
+      let result: 'oss' | 'good' | 'meh' = 'meh';
       let scoreAdd = 50;
-      let color = '#39ff14'; // neon green
+      let color = 'var(--neon-pink)';
 
       if (diff <= 0.045) {
-        result = 'perfect';
+        result = 'oss';
         scoreAdd = 200;
-        color = 'var(--neon-cyan)';
+        color = 'var(--neon-green)';
+        
+        // Rhythmic "OSS!" shoutout chance!
+        if (Math.random() < 0.4) {
+          audio.speakCoach("OSS!");
+        }
       } else if (diff <= 0.09) {
-        result = 'great';
+        result = 'good';
         scoreAdd = 100;
-        color = 'var(--neon-yellow)';
+        color = 'var(--neon-cyan)';
       } else {
-        result = 'ok';
+        result = 'meh';
         scoreAdd = 50;
-        color = '#a855f7'; // neon purple
+        color = 'var(--neon-pink)';
       }
 
       note.hitResult = result;
@@ -122,17 +151,16 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
 
       // Trigger visual hit spark text
       const laneIndex = ['left', 'down', 'up', 'right'].indexOf(direction);
-      const laneWidth = dimensions.width / 4;
+      const laneWidth = rhythmDim.width / 4;
       const x = laneIndex * laneWidth + laneWidth / 2;
-      const targetY = dimensions.height - 130;
 
       floatingTextsRef.current.push({
-        text: result.toUpperCase(),
+        text: result === 'oss' ? 'OSS!' : result.toUpperCase(),
         color,
         x,
         y: targetY - 20,
         opacity: 1,
-        scale: 1.2,
+        scale: result === 'oss' ? 1.5 : 1.1,
       });
     } else {
       // Ghost tap / Miss
@@ -142,17 +170,24 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
 
   // Main Canvas Rendering Loop
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const fCanvas = fighterCanvasRef.current;
+    const rCanvas = rhythmCanvasRef.current;
+    if (!fCanvas || !rCanvas) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const fCtx = fCanvas.getContext('2d');
+    const rCtx = rCanvas.getContext('2d');
+    if (!fCtx || !rCtx) return;
 
-    // Handle high DPI retina screen support
+    // Handle high DPI retina screens
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = dimensions.width * dpr;
-    canvas.height = dimensions.height * dpr;
-    ctx.scale(dpr, dpr);
+    
+    fCanvas.width = fighterDim.width * dpr;
+    fCanvas.height = fighterDim.height * dpr;
+    fCtx.scale(dpr, dpr);
+
+    rCanvas.width = rhythmDim.width * dpr;
+    rCanvas.height = rhythmDim.height * dpr;
+    rCtx.scale(dpr, dpr);
 
     let animationFrameId: number;
 
@@ -160,27 +195,22 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       const state = matchStateRef.current;
       const songTime = song ? audio.getCurrentTime(state.calibrationOffset) : 0;
 
-      // Clear canvas
-      ctx.fillStyle = '#07080b';
-      ctx.fillRect(0, 0, dimensions.width, dimensions.height);
+      // ─── 1. Draw Fighter Canvas ───
+      fCtx.fillStyle = '#0e0f14';
+      fCtx.fillRect(0, 0, fighterDim.width, fighterDim.height);
+      drawDojoGrid(fCtx, songTime, fighterDim.width, fighterDim.height);
+      drawBJJGrapplers(fCtx, songTime, state, fighterDim.width, fighterDim.height);
 
-      // --- 1. Draw Tatami Mat & Grappling Fighters (Animation Panel) ---
-      // Draw background cybergrid dojo
-      drawDojoGrid(ctx, songTime);
+      // ─── 2. Draw Rhythm Canvas ───
+      rCtx.fillStyle = '#07080b';
+      rCtx.fillRect(0, 0, rhythmDim.width, rhythmDim.height);
+      drawRhythmHighway(rCtx, songTime, rhythmDim.width, rhythmDim.height);
+      drawFloatingTexts(rCtx);
 
-      // Draw the BJJ Grapplers in action
-      drawBJJGrapplers(ctx, songTime, state);
-
-      // --- 2. Draw Scrolling Lanes (Rhythm Highway) ---
-      drawRhythmHighway(ctx, songTime);
-
-      // --- 3. Draw Floating Score Text Sparks ---
-      drawFloatingTexts(ctx);
-
-      // --- 4. Process Automatic Note Misses ---
+      // ─── 3. Process Automatic Note Misses ───
       if (song && state.gameStatus === 'playing') {
+        const targetY = rhythmDim.height - 110;
         song.notes.forEach((note) => {
-          // If note is past the hit window and hasn't been hit, register as Miss
           if (!note.hit && songTime > note.time + 0.16) {
             note.hit = true;
             note.hitResult = 'miss';
@@ -188,17 +218,16 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
 
             // Trigger floaty MISS text
             const laneIndex = ['left', 'down', 'up', 'right'].indexOf(note.direction);
-            const laneWidth = dimensions.width / 4;
+            const laneWidth = rhythmDim.width / 4;
             const x = laneIndex * laneWidth + laneWidth / 2;
-            const targetY = dimensions.height - 130;
 
             floatingTextsRef.current.push({
-              text: 'MISS',
+              text: 'MEH...',
               color: 'var(--neon-pink)',
               x,
               y: targetY - 20,
               opacity: 1,
-              scale: 1.0,
+              scale: 0.9,
             });
           }
         });
@@ -212,72 +241,66 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [dimensions, song]);
+  }, [fighterDim, rhythmDim, song]);
 
-  // Draw cyber-grids on Tatami Mat
-  const drawDojoGrid = (ctx: CanvasRenderingContext2D, songTime: number) => {
-    const startY = 80;
-    const endY = dimensions.height - 230;
-    
-    if (endY <= startY) return;
-
+  // Draw full-canvas cyber dojo grid
+  const drawDojoGrid = (ctx: CanvasRenderingContext2D, songTime: number, width: number, height: number) => {
     ctx.save();
     
     // Background glow
-    const grad = ctx.createLinearGradient(0, startY, 0, endY);
+    const grad = ctx.createLinearGradient(0, 0, 0, height);
     grad.addColorStop(0, '#090a0f');
-    grad.addColorStop(1, '#13141f');
+    grad.addColorStop(1, '#12131c');
     ctx.fillStyle = grad;
-    ctx.fillRect(0, startY, dimensions.width, endY - startY);
-
-    // Neon horizon line
-    ctx.strokeStyle = 'rgba(114, 9, 183, 0.4)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(0, startY);
-    ctx.lineTo(dimensions.width, startY);
-    ctx.stroke();
+    ctx.fillRect(0, 0, width, height);
 
     // Rhythmic pulse grid
     const pulse = Math.sin(songTime * Math.PI * 2) * 0.5 + 0.5;
-    ctx.strokeStyle = `rgba(0, 245, 212, ${0.1 + pulse * 0.08})`;
+    ctx.strokeStyle = `rgba(114, 9, 183, ${0.12 + pulse * 0.08})`;
     ctx.lineWidth = 1;
 
     // Perspective lines radiating outward
     const lineCount = 10;
+    const startY = height * 0.25; // Horizon line at 25% height
     for (let i = 0; i <= lineCount; i++) {
       const xRatio = i / lineCount;
-      const startX = dimensions.width * xRatio;
-      const endX = (startX - dimensions.width / 2) * 2 + dimensions.width / 2;
+      const startX = width * xRatio;
+      const endX = (startX - width / 2) * 2.2 + width / 2;
 
       ctx.beginPath();
       ctx.moveTo(startX, startY);
-      ctx.lineTo(endX, endY);
+      ctx.lineTo(endX, height);
       ctx.stroke();
     }
 
     // Horizontal lines spacing closer together near horizon
-    const horizLines = 6;
+    const horizLines = 7;
     for (let i = 0; i < horizLines; i++) {
       const yRatio = Math.pow(i / horizLines, 2); // perspective compression
-      const y = startY + (endY - startY) * yRatio;
+      const y = startY + (height - startY) * yRatio;
       ctx.beginPath();
       ctx.moveTo(0, y);
-      ctx.lineTo(dimensions.width, y);
+      ctx.lineTo(width, y);
       ctx.stroke();
     }
 
     ctx.restore();
   };
 
-  // Procedurally draw Custom Fighter + Opponent scrambling
-  const drawBJJGrapplers = (ctx: CanvasRenderingContext2D, songTime: number, state: MatchState) => {
-    const centerY = (dimensions.height - 230 + 80) / 2 + 10;
-    const centerX = dimensions.width / 2;
+  // Draw Custom Fighter + Opponent with dynamic coordinates
+  const drawBJJGrapplers = (
+    ctx: CanvasRenderingContext2D,
+    songTime: number,
+    state: MatchState,
+    width: number,
+    height: number
+  ) => {
+    const centerY = height / 2 + 15;
+    const centerX = width / 2;
 
     ctx.save();
 
-    // Sound beat bounce calculation (smooth bounce)
+    // Beat bounce calculation
     const beatPhase = (songTime * (song ? song.bpm : 120) / 60) % 1;
     const bounceY = Math.sin(beatPhase * Math.PI) * 4;
 
@@ -286,23 +309,22 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
     let shakeY = 0;
     if (state.submission !== 'none') {
       const severity = state.isPlayerAttacking ? (state.chokeMeter / 100) : ((100 - state.chokeMeter) / 100);
-      const intensity = 3 + severity * 6;
+      const intensity = 3 + severity * 7;
       shakeX = (Math.random() - 0.5) * intensity;
       shakeY = (Math.random() - 0.5) * intensity;
     }
 
     ctx.translate(centerX + shakeX, centerY + bounceY + shakeY);
 
-    // Draw grappling shadow/mat footprint
-    const shadowGrad = ctx.createRadialGradient(0, 45, 1, 0, 45, 55);
-    shadowGrad.addColorStop(0, 'rgba(0,0,0,0.5)');
+    // Dynamic tatami ground shadow
+    const shadowGrad = ctx.createRadialGradient(0, 40, 1, 0, 40, 60);
+    shadowGrad.addColorStop(0, 'rgba(0,0,0,0.55)');
     shadowGrad.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = shadowGrad;
     ctx.beginPath();
-    ctx.ellipse(0, 45, 55, 12, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, 40, 60, 12, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Map fighter belt colors to draw code
     const getBeltHex = (color: FighterStyle['beltColor']): string => {
       switch (color) {
         case 'white': return '#ffffff';
@@ -314,45 +336,34 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
     };
 
     const playerBelt = getBeltHex(fighter.beltColor);
-    const opponentBelt = '#1a1a1a'; // Opponent is usually styled with Black/Master belt
+    const opponentBelt = '#1a1a1a'; // Black belt opponent
 
-    // ─── PROCEDURAL DRAW ENGINE FOR GRAAPLING POSITIONS ───
+    // Draw skeletal positions
     if (state.submission !== 'none') {
-      // 1. SUBMISSION STATES
       if (state.submission === 'triangle_attempt') {
-        // Player is locking Triangle from Guard
-        // Bottom player (Horizontal body), Top player (Angled flat)
         drawFighterSkeletal(ctx, -20, 25, 'horizontal', fighter, playerBelt);
         drawFighterSkeletal(ctx, 10, 5, 'triangle_trapped', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt);
       } else if (state.submission === 'rnc_attempt') {
-        // Player taking opponent's back and choking
         drawFighterSkeletal(ctx, -5, 15, 'back_seated', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt);
         drawFighterSkeletal(ctx, -12, 5, 'choking_back', fighter, playerBelt);
       } else if (state.submission === 'guillotine_attempt') {
-        // Front headlock snapped down
         drawFighterSkeletal(ctx, -15, 10, 'standing_choke', fighter, playerBelt);
         drawFighterSkeletal(ctx, 15, 20, 'bent_neck', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt);
       } else {
-        // Ezekiel choking from mount
         drawFighterSkeletal(ctx, 0, 30, 'horizontal', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt);
         drawFighterSkeletal(ctx, -5, 5, 'mount_choke', fighter, playerBelt);
       }
     } else {
-      // 2. STABLE NEUTRAL GRAPPLING POSITIONS
       if (state.position === 'guard') {
-        // Closed Guard
         drawFighterSkeletal(ctx, -20, 25, 'horizontal', fighter, playerBelt);
         drawFighterSkeletal(ctx, 10, 10, 'guard_top', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt);
       } else if (state.position === 'side_control') {
-        // Side Control
         drawFighterSkeletal(ctx, 0, 25, 'horizontal', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt);
         drawFighterSkeletal(ctx, -5, 10, 'side_top', fighter, playerBelt);
       } else if (state.position === 'mount') {
-        // Full Mount
         drawFighterSkeletal(ctx, 0, 25, 'horizontal', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt);
         drawFighterSkeletal(ctx, -2, -5, 'mount_top', fighter, playerBelt);
       } else {
-        // Back Control (Neutral seatbelt hooks)
         drawFighterSkeletal(ctx, 5, 20, 'seated', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt);
         drawFighterSkeletal(ctx, -10, 15, 'back_hooks', fighter, playerBelt);
       }
@@ -361,7 +372,7 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
     ctx.restore();
   };
 
-  // Helper to draw realistic stick-vector joints
+  // Draw beautiful BJJ joint sticks
   const drawFighterSkeletal = (
     ctx: CanvasRenderingContext2D,
     dx: number,
@@ -373,15 +384,12 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
     ctx.save();
     ctx.translate(dx, dy);
 
-    // Gender adjustments
     const torsoWidth = style.gender === 'male' ? 14 : style.gender === 'female' ? 10 : 12;
 
-    // Draw Gi jacket body
-    ctx.fillStyle = style.skinColor === '#9d4edd' ? '#21132f' : '#ffffff'; // White gi for player, dark gi for opponent
+    ctx.fillStyle = style.skinColor === '#9d4edd' ? '#21132f' : '#ffffff'; // White gi vs Dark gi
     ctx.strokeStyle = style.skinColor === '#9d4edd' ? '#9d4edd' : '#cbd5e1';
     ctx.lineWidth = 1.5;
 
-    // Heads and Joints positions mapping
     let headX = 0, headY = -35;
     let spineX = 0, spineY = 0;
     let armLX = -18, armLY = -15;
@@ -435,7 +443,7 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
     } else if (pose === 'choking_back') {
       headX = -2; headY = -35;
       spineX = -8; spineY = 8;
-      armLX = 15; armLY = -25; // choking wraps!
+      armLX = 15; armLY = -25;
       armRX = 2; armRY = -25;
     }
 
@@ -445,7 +453,7 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
     ctx.arc(headX, headY, 8, 0, Math.PI * 2);
     ctx.fill();
 
-    // Draw Hair Style dynamically!
+    // Draw Hair Style dynamically
     ctx.fillStyle = style.hairColor;
     if (style.hairStyle === 'spiky') {
       ctx.beginPath();
@@ -479,7 +487,6 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       ctx.beginPath();
       ctx.arc(headX, headY - 3, 9, Math.PI, 0);
       ctx.fill();
-      // Flowing tail
       ctx.beginPath();
       ctx.moveTo(headX - 8, headY - 2);
       ctx.quadraticCurveTo(headX - 12, headY + 12, headX - 6, headY + 16);
@@ -521,31 +528,30 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
     ctx.fillStyle = beltColorHex;
     ctx.beginPath();
     if (pose === 'horizontal') {
-      ctx.arc(spineX - 5, spineY, 4, 0, Math.PI*2);
+      ctx.arc(spineX - 5, spineY, 4, 0, Math.PI * 2);
     } else {
-      ctx.arc(spineX, spineY - 2, 4, 0, Math.PI*2);
+      ctx.arc(spineX, spineY - 2, 4, 0, Math.PI * 2);
     }
     ctx.fill();
 
-    // Draw Limbs (Hands/Feet)
+    // Draw Limbs
     ctx.strokeStyle = style.skinColor;
     ctx.lineWidth = 3;
     ctx.beginPath();
     
-    // Draw Left Arm (from shoulder to armLX, armLY)
+    // Left Arm
     ctx.moveTo(spineX - torsoWidth + 2, spineY - 10);
     ctx.lineTo(armLX, armLY);
     
-    // Draw Right Arm (from shoulder to armRX, armRY)
+    // Right Arm
     ctx.moveTo(spineX + torsoWidth - 2, spineY - 10);
     ctx.lineTo(armRX, armRY);
 
-    // Only draw legs if they are horizontal or we are drawing them
-    // Draw Left Leg (from hip to legLX, legLY)
+    // Left Leg
     ctx.moveTo(spineX - 6, spineY + 8);
     ctx.lineTo(legLX, legLY);
 
-    // Draw Right Leg (from hip to legRX, legRY)
+    // Right Leg
     ctx.moveTo(spineX + 6, spineY + 8);
     ctx.lineTo(legRX, legRY);
 
@@ -554,10 +560,10 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
     ctx.restore();
   };
 
-  // Draw the DDR scrolling highway
-  const drawRhythmHighway = (ctx: CanvasRenderingContext2D, songTime: number) => {
-    const laneWidth = dimensions.width / 4;
-    const targetY = dimensions.height - 130;
+  // Draw the compact, centered rhythm highway lanes
+  const drawRhythmHighway = (ctx: CanvasRenderingContext2D, songTime: number, width: number, height: number) => {
+    const laneWidth = width / 4;
+    const targetY = height - 110;
     const directions: DDRDirection[] = ['left', 'down', 'up', 'right'];
     const colors = ['var(--neon-pink)', 'var(--neon-cyan)', 'var(--neon-green)', 'var(--neon-yellow)'];
     const icons = ['←', '↓', '↑', '→'];
@@ -566,59 +572,56 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
     ctx.save();
 
     // Draw Lane Dividers
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+    ctx.lineWidth = 1.5;
     for (let i = 1; i < 4; i++) {
       ctx.beginPath();
-      ctx.moveTo(i * laneWidth, 120); // starts below grappling panel
-      ctx.lineTo(i * laneWidth, dimensions.height);
+      ctx.moveTo(i * laneWidth, 0);
+      ctx.lineTo(i * laneWidth, height);
       ctx.stroke();
     }
 
-    // Draw Static Targets (Bottom arrows recepticle)
+    // Draw Static Targets (Bottom arrows receptors)
     directions.forEach((_, i) => {
       const x = i * laneWidth + laneWidth / 2;
 
-      // Draw glowing background target rings
+      // Draw glowing background target rings in lane neon colors
       ctx.strokeStyle = colors[i];
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 2.5;
       ctx.beginPath();
       ctx.arc(x, targetY, 20, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Inside Target arrow representation
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-      ctx.font = 'bold 20px monospace';
+      // Inside Target arrow
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+      ctx.font = 'bold 22px monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(icons[i], x, targetY);
 
       // Label BJJ Actions
-      ctx.fillStyle = '#64748b';
-      ctx.font = '8px monospace';
-      ctx.fillText(actions[i], x, targetY + 30);
+      ctx.fillStyle = '#475569';
+      ctx.font = '9px monospace';
+      ctx.fillText(actions[i], x, targetY + 32);
     });
 
     // Draw SCROLLING NOTES
     if (song && matchStateRef.current.gameStatus === 'playing') {
-      const scrollSpeed = 330; // pixels per second scrolling speed
+      const scrollSpeed = 330; // pixels per second
 
       song.notes.forEach((note) => {
-        if (note.hit) return; // skip hit notes
+        if (note.hit) return;
 
         const laneIndex = directions.indexOf(note.direction);
         const x = laneIndex * laneWidth + laneWidth / 2;
         
-        // Calculate dynamic scroll placement
         const timeDiff = note.time - songTime;
         const y = targetY - timeDiff * scrollSpeed;
 
-        // Skip rendering notes that are way off the top screen
-        if (y < 120 || y > dimensions.height) return;
+        if (y < -30 || y > height) return;
 
-        // Draw the scrolling beat arrow
         ctx.save();
-        ctx.shadowBlur = 8;
+        ctx.shadowBlur = 9;
         ctx.shadowColor = colors[laneIndex];
 
         // Draw note circle wrapper
@@ -641,34 +644,73 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
     ctx.restore();
   };
 
-  // Draw fading, floaty text sparks (Perfect, Great, Ok, Miss)
+  // Draw fading, floaty text sparks
   const drawFloatingTexts = (ctx: CanvasRenderingContext2D) => {
     ctx.save();
     floatingTextsRef.current.forEach((item) => {
       ctx.fillStyle = item.color;
-      ctx.font = `bold ${Math.floor(13 * item.scale)}px monospace`;
+      ctx.font = `bold ${Math.floor(14 * item.scale)}px monospace`;
       ctx.textAlign = 'center';
       
-      // Add neon overlay glow
-      ctx.shadowBlur = 5;
+      ctx.shadowBlur = 6;
       ctx.shadowColor = item.color;
       
       ctx.globalAlpha = item.opacity;
       ctx.fillText(item.text, item.x, item.y);
 
-      // float upwards and fade
-      item.y -= 1.2;
-      item.opacity -= 0.035;
+      item.y -= 1.3;
+      item.opacity -= 0.032;
     });
 
-    // Remove dead animations
+    // Filter alive texts
     floatingTextsRef.current = floatingTextsRef.current.filter((item) => item.opacity > 0);
     ctx.restore();
   };
 
+  // Convert position IDs to pretty labels
+  const getPositionLabel = (pos: string) => {
+    switch (pos) {
+      case 'guard': return '🥋 Closed Guard';
+      case 'side_control': return '🤼 Side Control';
+      case 'mount': return '🌋 Full Mount';
+      case 'back_control': return '🎒 Back Control';
+      default: return '';
+    }
+  };
+
   return (
-    <div ref={containerRef} style={{ width: '100%', height: '100%', position: 'relative' }}>
-      <canvas ref={canvasRef} className="game-canvas" />
+    <div ref={containerRef} className="gameplay-layout">
+      
+      {/* 1. Fighter/Dojo Animation Panel */}
+      <div className="animation-panel">
+        <canvas ref={fighterCanvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />
+        
+        {/* Stat panel overlay inside canvas */}
+        <div style={{
+          position: 'absolute',
+          top: '15px',
+          left: '15px',
+          background: 'rgba(11, 12, 16, 0.85)',
+          padding: '10px',
+          borderRadius: '6px',
+          border: '1px solid #1e2937',
+          fontSize: '11px',
+          pointerEvents: 'none',
+          zIndex: 5
+        }}>
+          <div style={{ color: 'var(--text-muted)' }}>POSITION: <span style={{ color: '#fff', fontWeight: 'bold' }}>{getPositionLabel(matchState.position)}</span></div>
+          <div style={{ color: 'var(--text-muted)', marginTop: '4px' }}>SCORE: <span style={{ color: 'var(--neon-yellow)', fontWeight: 'bold' }}>{matchState.score}</span></div>
+          <div style={{ color: 'var(--text-muted)', marginTop: '4px' }}>COMBO: <span style={{ color: 'var(--neon-cyan)', fontWeight: 'bold' }}>{matchState.comboCount}</span></div>
+        </div>
+      </div>
+
+      {/* 2. Centered Rhythm Highway Panel */}
+      <div className="rhythm-panel">
+        <div className="rhythm-highway-container">
+          <canvas ref={rhythmCanvasRef} style={{ width: '100%', height: '100%', display: 'block' }} />
+        </div>
+      </div>
+
     </div>
   );
 });

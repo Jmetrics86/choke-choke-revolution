@@ -283,32 +283,45 @@ export class AudioEngine {
   }
 
   // Plays clean sound effects instantly
-  public playSFX(type: 'perfect' | 'great' | 'ok' | 'miss' | 'tap' | 'strain' | 'sweep') {
+  public playSFX(type: 'oss' | 'good' | 'meh' | 'miss' | 'tap' | 'strain' | 'sweep') {
     if (!this.ctx || !this.masterGainNode) return;
     const now = this.ctx.currentTime;
 
-    if (type === 'perfect') {
-      // Sparkling high-pitched double-beep
+    if (type === 'oss') {
+      // Super sparkling arpeggiated triple-beep representing "OSS!"
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.connect(gain);
       gain.connect(this.masterGainNode);
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(880, now);
-      osc.frequency.setValueAtTime(1320, now + 0.05);
-      gain.gain.setValueAtTime(0.18, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+      osc.frequency.setValueAtTime(1320, now + 0.04);
+      osc.frequency.setValueAtTime(1760, now + 0.08);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
       osc.start(now);
-      osc.stop(now + 0.15);
-    } else if (type === 'great' || type === 'ok') {
-      // Normal chime
+      osc.stop(now + 0.25);
+    } else if (type === 'good') {
+      // Crisp clear standard chime
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.connect(gain);
       gain.connect(this.masterGainNode);
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(type === 'great' ? 660 : 523, now);
+      osc.frequency.setValueAtTime(660, now);
       gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+      osc.start(now);
+      osc.stop(now + 0.15);
+    } else if (type === 'meh') {
+      // Lower tone short chime
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.connect(gain);
+      gain.connect(this.masterGainNode);
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(440, now);
+      gain.gain.setValueAtTime(0.12, now);
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
       osc.start(now);
       osc.stop(now + 0.12);

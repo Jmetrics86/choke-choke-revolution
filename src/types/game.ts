@@ -23,7 +23,7 @@ export interface BeatNote {
   direction: DDRDirection;
   action: 'shrimp' | 'sprawl' | 'posture' | 'sweep';
   hit: boolean;
-  hitResult: 'perfect' | 'great' | 'ok' | 'miss' | null;
+  hitResult: 'oss' | 'good' | 'meh' | 'miss' | null;
 }
 
 export interface SongBlueprint {
