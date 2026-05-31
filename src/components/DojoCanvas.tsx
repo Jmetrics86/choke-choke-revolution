@@ -314,7 +314,10 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       shakeY = (Math.random() - 0.5) * intensity;
     }
 
+    // Translate to center first, then apply dynamic scale factor based on screen height
     ctx.translate(centerX + shakeX, centerY + bounceY + shakeY);
+    const scaleFactor = Math.max(1.0, Math.min(width, height) / 170);
+    ctx.scale(scaleFactor, scaleFactor);
 
     // Dynamic tatami ground shadow
     const shadowGrad = ctx.createRadialGradient(0, 40, 1, 0, 40, 60);
