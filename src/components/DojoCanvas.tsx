@@ -13,6 +13,8 @@ interface DojoCanvasProps {
 
 export interface DojoCanvasRef {
   handleHitAttempt: (direction: DDRDirection) => void;
+  handleTouchStart: (direction: DDRDirection) => void;
+  handleTouchEnd: (direction: DDRDirection) => void;
 }
 
 interface FloatingText {
@@ -22,6 +24,16 @@ interface FloatingText {
   y: number;
   opacity: number;
   scale: number;
+}
+
+interface HitParticle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  color: string;
+  size: number;
+  opacity: number;
 }
 
 export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
@@ -42,15 +54,32 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
   const floatingTextsRef = useRef<FloatingText[]>([]);
   const matchStateRef = useRef<MatchState>(matchState);
 
+  // Active inputs tracker (Keyboard and Touch presses)
+  const activeKeysRef = useRef<Record<DDRDirection, boolean>>({
+    left: false,
+    down: false,
+    up: false,
+    right: false,
+  });
+
+  // Particle list reference for visual spark explosions
+  const particlesRef = useRef<HitParticle[]>([]);
+
   // Keep latest state in ref to avoid re-binding loops
   useEffect(() => {
     matchStateRef.current = matchState;
   }, [matchState]);
 
-  // Expose the handleHitAttempt function so parent screen can call it via ref
+  // Expose the input triggers to the parent screen (mobile buttons use these)
   useImperativeHandle(ref, () => ({
     handleHitAttempt(direction: DDRDirection) {
       handleHitAttempt(direction);
+    },
+    handleTouchStart(direction: DDRDirection) {
+      activeKeysRef.current[direction] = true;
+    },
+    handleTouchEnd(direction: DDRDirection) {
+      activeKeysRef.current[direction] = false;
     }
   }));
 
@@ -77,7 +106,6 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
 
     resizeObserver.observe(containerRef.current);
     
-    // Initial measure trigger with slight delay to ensure browser layout is stable
     const timer = setTimeout(measureAndResize, 150);
 
     return () => {
@@ -100,13 +128,66 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       if (direction) {
         e.preventDefault();
         onTriggerMobileTouch(direction); // Flashes virtual buttons
-        handleHitAttempt(direction);
+        
+        // Prevent keyboard auto-repeat from triggering multiple ghost taps
+        if (!activeKeysRef.current[direction]) {
+          activeKeysRef.current[direction] = true;
+          handleHitAttempt(direction);
+        }
+      }
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      let direction: DDRDirection | null = null;
+      if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') direction = 'left';
+      if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') direction = 'down';
+      if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') direction = 'up';
+      if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') direction = 'right';
+
+      if (direction) {
+        activeKeysRef.current[direction] = false;
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
   }, [song, rhythmDim]);
+
+  // Spawn visual particle explosions on successful hits
+  const spawnHitExplosion = (x: number, y: number, color: string) => {
+    for (let i = 0; i < 16; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 1.8 + Math.random() * 4.0;
+      particlesRef.current.push({
+        x,
+        y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        color,
+        size: 3 + Math.random() * 4,
+        opacity: 1.0,
+      });
+    }
+  };
+
+  // Spawn continuous minor sparks for hold notes
+  const spawnHoldSpark = (x: number, y: number, color: string) => {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 0.6 + Math.random() * 1.8;
+    particlesRef.current.push({
+      x,
+      y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      color,
+      size: 1.5 + Math.random() * 2.2,
+      opacity: 0.8,
+    });
+  };
 
   // Attempt to hit scrolling note on keyboard press or mobile tap
   const handleHitAttempt = (direction: DDRDirection) => {
@@ -149,10 +230,12 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       note.hitResult = result;
       onNoteHit(direction, scoreAdd, result);
 
-      // Trigger visual hit spark text
+      // Trigger visual hit spark text and neon explosion!
       const laneIndex = ['left', 'down', 'up', 'right'].indexOf(direction);
       const laneWidth = rhythmDim.width / 4;
       const x = laneIndex * laneWidth + laneWidth / 2;
+
+      spawnHitExplosion(x, targetY, ['var(--neon-pink)', 'var(--neon-cyan)', 'var(--neon-green)', 'var(--neon-yellow)'][laneIndex]);
 
       floatingTextsRef.current.push({
         text: result === 'oss' ? 'OSS!' : result.toUpperCase(),
@@ -166,6 +249,71 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       // Ghost tap / Miss
       onNoteMiss();
     }
+  };
+
+  // Continuous hold notes evaluation & progress check
+  const processHoldNotes = (songTime: number) => {
+    if (!song) return;
+    const targetY = rhythmDim.height - 110;
+    const directions: DDRDirection[] = ['left', 'down', 'up', 'right'];
+    const colors = ['var(--neon-pink)', 'var(--neon-cyan)', 'var(--neon-green)', 'var(--neon-yellow)'];
+
+    song.notes.forEach((note) => {
+      // Check for hold notes currently being held down by the user
+      if (note.isHold && note.hit && note.hitResult !== 'miss' && !note.holdScoreCollected) {
+        const holdEnd = note.time + (note.holdDuration || 0);
+
+        if (songTime >= note.time && songTime <= holdEnd) {
+          // Player must actively keep the key pressed!
+          const isHolding = activeKeysRef.current[note.direction];
+          if (isHolding && !note.holdReleasedEarly) {
+            // Success holding! Spawn electrical sparks!
+            const laneIndex = directions.indexOf(note.direction);
+            const laneWidth = rhythmDim.width / 4;
+            const x = laneIndex * laneWidth + laneWidth / 2;
+            
+            spawnHoldSpark(x, targetY, colors[laneIndex]);
+          } else {
+            // Player let go too early
+            if (!note.holdReleasedEarly) {
+              note.holdReleasedEarly = true;
+            }
+          }
+        } else if (songTime > holdEnd) {
+          // Hold note just completed! Assess success
+          note.holdScoreCollected = true;
+          
+          const isHoldingAtEnd = activeKeysRef.current[note.direction];
+          const success = !note.holdReleasedEarly && isHoldingAtEnd;
+
+          // Award final big holding bonus on success!
+          const result = success ? 'oss' : 'meh';
+          const scoreAdd = success ? 250 : 0;
+          const color = success ? 'var(--neon-green)' : 'var(--neon-pink)';
+
+          onNoteHit(note.direction, scoreAdd, result);
+
+          // Spawn a massive final explosion!
+          const laneIndex = directions.indexOf(note.direction);
+          const laneWidth = rhythmDim.width / 4;
+          const x = laneIndex * laneWidth + laneWidth / 2;
+
+          if (success) {
+            spawnHitExplosion(x, targetY, colors[laneIndex]);
+            audio.playSFX('oss');
+          }
+
+          floatingTextsRef.current.push({
+            text: success ? 'HOLD OSS!' : 'RELEASED EARLY',
+            color,
+            x,
+            y: targetY - 30,
+            opacity: 1,
+            scale: success ? 1.5 : 0.9,
+          });
+        }
+      }
+    });
   };
 
   // Main Canvas Rendering Loop
@@ -205,18 +353,25 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       rCtx.fillStyle = '#07080b';
       rCtx.fillRect(0, 0, rhythmDim.width, rhythmDim.height);
       drawRhythmHighway(rCtx, songTime, rhythmDim.width, rhythmDim.height);
+      updateAndDrawParticles(rCtx);
       drawFloatingTexts(rCtx);
+
+      // Process Hold Notes hold-state scoring
+      if (song && state.gameStatus === 'playing') {
+        processHoldNotes(songTime);
+      }
 
       // ─── 3. Process Automatic Note Misses ───
       if (song && state.gameStatus === 'playing') {
         const targetY = rhythmDim.height - 110;
         song.notes.forEach((note) => {
-          if (!note.hit && songTime > note.time + 0.16) {
+          // If normal note or hold head passes without tapping, register miss
+          const gracePeriod = note.isHold ? 0.18 : 0.16;
+          if (!note.hit && songTime > note.time + gracePeriod) {
             note.hit = true;
             note.hitResult = 'miss';
             onNoteMiss();
 
-            // Trigger floaty MISS text
             const laneIndex = ['left', 'down', 'up', 'right'].indexOf(note.direction);
             const laneWidth = rhythmDim.width / 4;
             const x = laneIndex * laneWidth + laneWidth / 2;
@@ -243,25 +398,47 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
     };
   }, [fighterDim, rhythmDim, song]);
 
+  // Update physics and draw spark particles
+  const updateAndDrawParticles = (ctx: CanvasRenderingContext2D) => {
+    ctx.save();
+    particlesRef.current.forEach((p) => {
+      ctx.shadowBlur = 6;
+      ctx.shadowColor = p.color;
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = p.opacity;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Physics update
+      p.x += p.vx;
+      p.y += p.vy;
+      p.opacity -= 0.04;
+      p.size *= 0.95;
+    });
+
+    // Clean dead particles
+    particlesRef.current = particlesRef.current.filter((p) => p.opacity > 0 && p.size > 0.1);
+    ctx.restore();
+  };
+
   // Draw full-canvas cyber dojo grid
   const drawDojoGrid = (ctx: CanvasRenderingContext2D, songTime: number, width: number, height: number) => {
     ctx.save();
     
-    // Background glow
     const grad = ctx.createLinearGradient(0, 0, 0, height);
     grad.addColorStop(0, '#090a0f');
     grad.addColorStop(1, '#12131c');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, width, height);
 
-    // Rhythmic pulse grid
     const pulse = Math.sin(songTime * Math.PI * 2) * 0.5 + 0.5;
     ctx.strokeStyle = `rgba(114, 9, 183, ${0.12 + pulse * 0.08})`;
     ctx.lineWidth = 1;
 
-    // Perspective lines radiating outward
     const lineCount = 10;
-    const startY = height * 0.25; // Horizon line at 25% height
+    const startY = height * 0.25;
     for (let i = 0; i <= lineCount; i++) {
       const xRatio = i / lineCount;
       const startX = width * xRatio;
@@ -273,10 +450,9 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       ctx.stroke();
     }
 
-    // Horizontal lines spacing closer together near horizon
     const horizLines = 7;
     for (let i = 0; i < horizLines; i++) {
-      const yRatio = Math.pow(i / horizLines, 2); // perspective compression
+      const yRatio = Math.pow(i / horizLines, 2);
       const y = startY + (height - startY) * yRatio;
       ctx.beginPath();
       ctx.moveTo(0, y);
@@ -300,11 +476,9 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
 
     ctx.save();
 
-    // Beat bounce calculation
     const beatPhase = (songTime * (song ? song.bpm : 120) / 60) % 1;
     const bounceY = Math.sin(beatPhase * Math.PI) * 4;
 
-    // Extreme shake jitter for submission locks
     let shakeX = 0;
     let shakeY = 0;
     if (state.submission !== 'none') {
@@ -339,9 +513,8 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
     };
 
     const playerBelt = getBeltHex(fighter.beltColor);
-    const opponentBelt = '#1a1a1a'; // Black belt opponent
+    const opponentBelt = '#1a1a1a';
 
-    // Draw skeletal positions
     if (state.submission !== 'none') {
       if (state.submission === 'triangle_attempt') {
         drawFighterSkeletal(ctx, -20, 25, 'horizontal', fighter, playerBelt);
@@ -389,7 +562,7 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
 
     const torsoWidth = style.gender === 'male' ? 14 : style.gender === 'female' ? 10 : 12;
 
-    ctx.fillStyle = style.skinColor === '#9d4edd' ? '#21132f' : '#ffffff'; // White gi vs Dark gi
+    ctx.fillStyle = style.skinColor === '#9d4edd' ? '#21132f' : '#ffffff';
     ctx.strokeStyle = style.skinColor === '#9d4edd' ? '#9d4edd' : '#cbd5e1';
     ctx.lineWidth = 1.5;
 
@@ -450,13 +623,11 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       armRX = 2; armRY = -25;
     }
 
-    // Draw Head
     ctx.fillStyle = style.skinColor;
     ctx.beginPath();
     ctx.arc(headX, headY, 8, 0, Math.PI * 2);
     ctx.fill();
 
-    // Draw Hair Style dynamically
     ctx.fillStyle = style.hairColor;
     if (style.hairStyle === 'spiky') {
       ctx.beginPath();
@@ -502,7 +673,6 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       ctx.fill();
     }
 
-    // Draw Torso Gi
     ctx.strokeStyle = style.skinColor === '#9d4edd' ? '#7209b7' : '#e2e8f0';
     ctx.fillStyle = style.skinColor === '#9d4edd' ? '#140c1e' : '#ffffff';
     ctx.beginPath();
@@ -514,7 +684,6 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
     ctx.fill();
     ctx.stroke();
 
-    // Draw the BJJ Belt Rank
     ctx.strokeStyle = beltColorHex;
     ctx.lineWidth = 4;
     ctx.beginPath();
@@ -527,7 +696,6 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
     }
     ctx.stroke();
 
-    // Tiny belt knot decoration
     ctx.fillStyle = beltColorHex;
     ctx.beginPath();
     if (pose === 'horizontal') {
@@ -537,24 +705,19 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
     }
     ctx.fill();
 
-    // Draw Limbs
     ctx.strokeStyle = style.skinColor;
     ctx.lineWidth = 3;
     ctx.beginPath();
     
-    // Left Arm
     ctx.moveTo(spineX - torsoWidth + 2, spineY - 10);
     ctx.lineTo(armLX, armLY);
     
-    // Right Arm
     ctx.moveTo(spineX + torsoWidth - 2, spineY - 10);
     ctx.lineTo(armRX, armRY);
 
-    // Left Leg
     ctx.moveTo(spineX - 6, spineY + 8);
     ctx.lineTo(legLX, legLY);
 
-    // Right Leg
     ctx.moveTo(spineX + 6, spineY + 8);
     ctx.lineTo(legRX, legRY);
 
@@ -584,40 +747,55 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       ctx.stroke();
     }
 
-    // Draw Static Targets (Bottom arrows receptors)
-    directions.forEach((_, i) => {
-      const x = i * laneWidth + laneWidth / 2;
-
-      // Draw glowing background target rings in lane neon colors
-      ctx.strokeStyle = colors[i];
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      ctx.arc(x, targetY, 20, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // Inside Target arrow
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
-      ctx.font = 'bold 22px monospace';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(icons[i], x, targetY);
-
-      // Label BJJ Actions
-      ctx.fillStyle = '#475569';
-      ctx.font = '9px monospace';
-      ctx.fillText(actions[i], x, targetY + 32);
-    });
-
-    // Draw SCROLLING NOTES
+    // Draw SCROLLING NOTES (tails first so they render under the arrow heads!)
     if (song && matchStateRef.current.gameStatus === 'playing') {
       const scrollSpeed = 330; // pixels per second
 
       song.notes.forEach((note) => {
-        if (note.hit) return;
-
         const laneIndex = directions.indexOf(note.direction);
         const x = laneIndex * laneWidth + laneWidth / 2;
-        
+
+        if (note.isHold) {
+          const holdEnd = note.time + (note.holdDuration || 0);
+
+          if (songTime < holdEnd) {
+            // Draw the hold tail body stretching upwards!
+            const headY = targetY - (note.time - songTime) * scrollSpeed;
+            const tailY = targetY - (holdEnd - songTime) * scrollSpeed;
+
+            // Pin tail start to targets if actively held, otherwise float on the head
+            const startY = note.hit ? targetY : headY;
+
+            if (startY > tailY) {
+              ctx.save();
+              ctx.shadowBlur = 10;
+              ctx.shadowColor = colors[laneIndex];
+
+              // Glowing semi-transparent thick body
+              ctx.strokeStyle = colors[laneIndex];
+              ctx.lineWidth = 15;
+              ctx.lineCap = 'round';
+              ctx.beginPath();
+              ctx.moveTo(x, startY);
+              ctx.lineTo(x, tailY);
+              ctx.stroke();
+
+              // Electrical solid white lightning core
+              ctx.strokeStyle = '#ffffff';
+              ctx.lineWidth = 4;
+              ctx.beginPath();
+              ctx.moveTo(x, startY);
+              ctx.lineTo(x, tailY);
+              ctx.stroke();
+
+              ctx.restore();
+            }
+          }
+        }
+
+        // Normal note head - skip if already successfully hit
+        if (note.hit) return;
+
         const timeDiff = note.time - songTime;
         const y = targetY - timeDiff * scrollSpeed;
 
@@ -644,6 +822,60 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       });
     }
 
+    // Draw Static Targets (Bottom arrows receptors)
+    directions.forEach((dir, i) => {
+      const x = i * laneWidth + laneWidth / 2;
+      const isPressed = activeKeysRef.current[dir];
+      const color = colors[i];
+
+      ctx.save();
+      
+      if (isPressed) {
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = color;
+        
+        // Glowing background fill
+        ctx.fillStyle = color + '22';
+        ctx.beginPath();
+        ctx.arc(x, targetY, 23, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Thickened active ring
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 3.5;
+        ctx.beginPath();
+        ctx.arc(x, targetY, 23, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Fully solid glowing arrow symbol
+        ctx.fillStyle = color;
+        ctx.font = 'bold 24px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(icons[i], x, targetY);
+      } else {
+        // Subtle column color indicator permanently active (No more boring gray!)
+        ctx.strokeStyle = color + '55'; // 33% opacity ring
+        ctx.lineWidth = 2.0;
+        ctx.beginPath();
+        ctx.arc(x, targetY, 20, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = color + '80'; // 50% opacity arrow symbol
+        ctx.font = 'bold 21px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(icons[i], x, targetY);
+      }
+
+      // Label BJJ Actions (glowing on active)
+      ctx.fillStyle = isPressed ? '#ffffff' : '#475569';
+      ctx.font = 'bold 9px monospace';
+      ctx.fillText(actions[i], x, targetY + 32);
+
+      ctx.restore();
+    });
+
     ctx.restore();
   };
 
@@ -665,7 +897,6 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       item.opacity -= 0.032;
     });
 
-    // Filter alive texts
     floatingTextsRef.current = floatingTextsRef.current.filter((item) => item.opacity > 0);
     ctx.restore();
   };

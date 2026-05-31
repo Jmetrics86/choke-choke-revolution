@@ -24,6 +24,11 @@ export interface BeatNote {
   action: 'shrimp' | 'sprawl' | 'posture' | 'sweep';
   hit: boolean;
   hitResult: 'oss' | 'good' | 'meh' | 'miss' | null;
+  // Hold Note properties
+  isHold?: boolean;
+  holdDuration?: number; // in seconds, represents how long to hold the key
+  holdReleasedEarly?: boolean;
+  holdScoreCollected?: boolean;
 }
 
 export interface SongBlueprint {

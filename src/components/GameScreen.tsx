@@ -185,8 +185,11 @@ export const GameScreen: React.FC<GameScreenProps> = ({
       <div className="mobile-touchpad">
         <div 
           className="touch-btn left-btn" 
-          onTouchStart={() => canvasRef.current?.handleHitAttempt('left')}
-          onClick={() => canvasRef.current?.handleHitAttempt('left')}
+          onTouchStart={(e) => { e.preventDefault(); canvasRef.current?.handleTouchStart('left'); canvasRef.current?.handleHitAttempt('left'); }}
+          onTouchEnd={() => canvasRef.current?.handleTouchEnd('left')}
+          onMouseDown={() => { canvasRef.current?.handleTouchStart('left'); canvasRef.current?.handleHitAttempt('left'); }}
+          onMouseUp={() => canvasRef.current?.handleTouchEnd('left')}
+          onMouseLeave={() => canvasRef.current?.handleTouchEnd('left')}
           style={{ background: activeButton === 'left' ? 'rgba(255, 0, 85, 0.25)' : 'transparent' }}
         >
           <div className="touch-icon left-color">←</div>
@@ -194,8 +197,11 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         </div>
         <div 
           className="touch-btn down-btn" 
-          onTouchStart={() => canvasRef.current?.handleHitAttempt('down')}
-          onClick={() => canvasRef.current?.handleHitAttempt('down')}
+          onTouchStart={(e) => { e.preventDefault(); canvasRef.current?.handleTouchStart('down'); canvasRef.current?.handleHitAttempt('down'); }}
+          onTouchEnd={() => canvasRef.current?.handleTouchEnd('down')}
+          onMouseDown={() => { canvasRef.current?.handleTouchStart('down'); canvasRef.current?.handleHitAttempt('down'); }}
+          onMouseUp={() => canvasRef.current?.handleTouchEnd('down')}
+          onMouseLeave={() => canvasRef.current?.handleTouchEnd('down')}
           style={{ background: activeButton === 'down' ? 'rgba(0, 245, 212, 0.25)' : 'transparent' }}
         >
           <div className="touch-icon down-color">↓</div>
@@ -203,8 +209,11 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         </div>
         <div 
           className="touch-btn up-btn" 
-          onTouchStart={() => canvasRef.current?.handleHitAttempt('up')}
-          onClick={() => canvasRef.current?.handleHitAttempt('up')}
+          onTouchStart={(e) => { e.preventDefault(); canvasRef.current?.handleTouchStart('up'); canvasRef.current?.handleHitAttempt('up'); }}
+          onTouchEnd={() => canvasRef.current?.handleTouchEnd('up')}
+          onMouseDown={() => { canvasRef.current?.handleTouchStart('up'); canvasRef.current?.handleHitAttempt('up'); }}
+          onMouseUp={() => canvasRef.current?.handleTouchEnd('up')}
+          onMouseLeave={() => canvasRef.current?.handleTouchEnd('up')}
           style={{ background: activeButton === 'up' ? 'rgba(57, 255, 20, 0.25)' : 'transparent' }}
         >
           <div className="touch-icon up-color">↑</div>
@@ -212,8 +221,11 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         </div>
         <div 
           className="touch-btn right-btn" 
-          onTouchStart={() => canvasRef.current?.handleHitAttempt('right')}
-          onClick={() => canvasRef.current?.handleHitAttempt('right')}
+          onTouchStart={(e) => { e.preventDefault(); canvasRef.current?.handleTouchStart('right'); canvasRef.current?.handleHitAttempt('right'); }}
+          onTouchEnd={() => canvasRef.current?.handleTouchEnd('right')}
+          onMouseDown={() => { canvasRef.current?.handleTouchStart('right'); canvasRef.current?.handleHitAttempt('right'); }}
+          onMouseUp={() => canvasRef.current?.handleTouchEnd('right')}
+          onMouseLeave={() => canvasRef.current?.handleTouchEnd('right')}
           style={{ background: activeButton === 'right' ? 'rgba(255, 234, 0, 0.25)' : 'transparent' }}
         >
           <div className="touch-icon right-color">→</div>

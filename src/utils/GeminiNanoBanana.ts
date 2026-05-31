@@ -20,6 +20,7 @@ export function generateBeatmap(bpm: number, duration: number, style: string): B
       // Strong focus on sprawl (Down) and posture (Up)
       if (beat % 2 === 0) {
         const dirIndex = beat % 4 === 0 ? 1 : 2; // alternates Down/Up
+        const isHold = beat % 6 === 0;
         notes.push({
           id: `note-${beat}-1`,
           time: Number(time.toFixed(3)),
@@ -27,6 +28,8 @@ export function generateBeatmap(bpm: number, duration: number, style: string): B
           action: actions[dirIndex],
           hit: false,
           hitResult: null,
+          isHold,
+          holdDuration: isHold ? Number((secondsPerBeat * 1.5).toFixed(3)) : undefined,
         });
       } else if (beat % 3 === 0) {
         // Occasionally add side transitions (Left/Right)
@@ -44,6 +47,7 @@ export function generateBeatmap(bpm: number, duration: number, style: string): B
       // Funk is highly syncopated! Notes occur on half-beats (eighth notes) and off-beats
       if (beat % 4 === 0) {
         // First beat is always on
+        const isHold = beat % 8 === 0;
         notes.push({
           id: `note-${beat}-f1`,
           time: Number(time.toFixed(3)),
@@ -51,6 +55,8 @@ export function generateBeatmap(bpm: number, duration: number, style: string): B
           action: 'sprawl',
           hit: false,
           hitResult: null,
+          isHold,
+          holdDuration: isHold ? Number((secondsPerBeat * 1.25).toFixed(3)) : undefined,
         });
       } else if (beat % 4 === 1.5 || beat % 4 === 1) {
         // Syncopated swing notes
@@ -77,6 +83,7 @@ export function generateBeatmap(bpm: number, duration: number, style: string): B
     } else if (style === 'synthwave') {
       // Synthwave has smooth, flowing arpeggio streams (running patterns of Arrows)
       const streamIndex = beat % 4;
+      const isHold = beat % 8 === 0;
       notes.push({
         id: `note-${beat}-sw`,
         time: Number(time.toFixed(3)),
@@ -84,6 +91,8 @@ export function generateBeatmap(bpm: number, duration: number, style: string): B
         action: actions[streamIndex],
         hit: false,
         hitResult: null,
+        isHold,
+        holdDuration: isHold ? Number((secondsPerBeat * 1.75).toFixed(3)) : undefined,
       });
 
       // Add double notes on purple/higher-end difficulties for rhythmic tension
