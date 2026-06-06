@@ -36,6 +36,8 @@ interface HitParticle {
   opacity: number;
 }
 
+const getTargetY = (h: number) => h > 350 ? h - 110 : h - 75;
+
 export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
   song,
   fighter,
@@ -193,7 +195,7 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
   const handleHitAttempt = (direction: DDRDirection) => {
     if (!song) return;
     const songTime = audio.getCurrentTime(matchStateRef.current.calibrationOffset);
-    const targetY = rhythmDim.height - 110;
+    const targetY = getTargetY(rhythmDim.height);
 
     // Find the earliest unhit note in the correct direction
     const note = song.notes.find(
@@ -254,7 +256,7 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
   // Continuous hold notes evaluation & progress check
   const processHoldNotes = (songTime: number) => {
     if (!song) return;
-    const targetY = rhythmDim.height - 110;
+    const targetY = getTargetY(rhythmDim.height);
     const directions: DDRDirection[] = ['left', 'down', 'up', 'right'];
     const colors = ['var(--neon-pink)', 'var(--neon-cyan)', 'var(--neon-green)', 'var(--neon-yellow)'];
 
@@ -363,7 +365,7 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
 
       // ─── 3. Process Automatic Note Misses ───
       if (song && state.gameStatus === 'playing') {
-        const targetY = rhythmDim.height - 110;
+        const targetY = getTargetY(rhythmDim.height);
         song.notes.forEach((note) => {
           // If normal note or hold head passes without tapping, register miss
           const gracePeriod = note.isHold ? 0.18 : 0.16;
@@ -829,7 +831,7 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
   // Draw the compact, centered rhythm highway lanes
   const drawRhythmHighway = (ctx: CanvasRenderingContext2D, songTime: number, width: number, height: number) => {
     const laneWidth = width / 4;
-    const targetY = height - 110;
+    const targetY = getTargetY(height);
     const directions: DDRDirection[] = ['left', 'down', 'up', 'right'];
     const colors = ['var(--neon-pink)', 'var(--neon-cyan)', 'var(--neon-green)', 'var(--neon-yellow)'];
     const icons = ['←', '↓', '↑', '→'];
@@ -971,7 +973,7 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       // Label BJJ Actions (glowing on active)
       ctx.fillStyle = isPressed ? '#ffffff' : '#475569';
       ctx.font = 'bold 9px monospace';
-      ctx.fillText(actions[i], x, targetY + 32);
+      ctx.fillText(actions[i], x, targetY + (height > 350 ? 32 : 20));
 
       ctx.restore();
     });

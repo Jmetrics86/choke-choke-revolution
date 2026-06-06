@@ -121,7 +121,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   };
 
   return (
-    <div className="app-container" style={{ background: '#07080b' }}>
+    <div className="game-screen-container" style={{ background: '#07080b' }}>
       
       {/* ─── HUD TOP BAR ─── */}
       <div className="dojo-header" style={{ borderBottomColor: 'var(--neon-pink)' }}>
