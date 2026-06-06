@@ -62,9 +62,7 @@ export const CharacterCustomizer: React.FC<CharacterCustomizerProps> = ({
       const centerY = canvas.height / 2 + 10;
       
       ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-      ctx.beginPath();
-      ctx.ellipse(centerX, centerY + 30, 40, 8, 0, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.fillRect(centerX - 35, centerY + 28, 70, 6);
 
       // Bouncing beat simulation
       const bounceY = Math.sin(frame * 0.1) * 3;
@@ -75,66 +73,45 @@ export const CharacterCustomizer: React.FC<CharacterCustomizerProps> = ({
       // Gender widths
       const torsoWidth = fighter.gender === 'male' ? 12 : fighter.gender === 'female' ? 9 : 11;
       
-      // 1. Draw head
+      // 1. Draw head (Blocky)
       ctx.fillStyle = fighter.skinColor;
-      ctx.beginPath();
-      ctx.arc(0, -20, 10, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.fillRect(-9, -29, 18, 18);
 
-      // 2. Draw hair style
+      // 2. Draw hair style (Blocky)
       ctx.fillStyle = fighter.hairColor;
       if (fighter.hairStyle === 'spiky') {
-        ctx.beginPath();
-        ctx.moveTo(-10, -22);
-        ctx.lineTo(-14, -32);
-        ctx.lineTo(-4, -26);
-        ctx.lineTo(0, -36);
-        ctx.lineTo(4, -26);
-        ctx.lineTo(14, -32);
-        ctx.lineTo(10, -22);
-        ctx.fill();
+        ctx.fillRect(-10, -34, 3, 5);
+        ctx.fillRect(-6, -37, 3, 8);
+        ctx.fillRect(-2, -39, 4, 10);
+        ctx.fillRect(3, -37, 3, 8);
+        ctx.fillRect(7, -34, 3, 5);
       } else if (fighter.hairStyle === 'mohawk') {
-        ctx.beginPath();
-        ctx.moveTo(-2, -30);
-        ctx.lineTo(-4, -38);
-        ctx.lineTo(0, -41);
-        ctx.lineTo(4, -38);
-        ctx.lineTo(2, -30);
-        ctx.fill();
+        ctx.fillRect(-2, -41, 4, 12);
+        ctx.fillRect(-1, -43, 2, 2);
       } else if (fighter.hairStyle === 'afro') {
-        ctx.beginPath();
-        ctx.arc(0, -26, 9, 0, Math.PI * 2);
-        ctx.arc(-8, -22, 7, 0, Math.PI * 2);
-        ctx.arc(8, -22, 7, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.fillRect(-13, -34, 26, 12); // center block
+        ctx.fillRect(-10, -38, 20, 4);  // top block
+        ctx.fillRect(-13, -28, 26, 8);  // side flare
       } else if (fighter.hairStyle === 'short') {
-        ctx.beginPath();
-        ctx.arc(0, -22, 11, Math.PI, 0);
-        ctx.fill();
+        ctx.fillRect(-10, -32, 20, 5); // top cap
+        ctx.fillRect(-10, -32, 3, 11); // left sideburn
+        ctx.fillRect(7, -32, 3, 11);  // right sideburn
       } else if (fighter.hairStyle === 'long') {
-        ctx.beginPath();
-        ctx.arc(0, -22, 11, Math.PI, 0);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(-10, -20);
-        ctx.quadraticCurveTo(-14, 0, -6, 4);
-        ctx.quadraticCurveTo(-6, -4, -10, -20);
-        ctx.fill();
+        ctx.fillRect(-10, -32, 20, 5); // top cap
+        ctx.fillRect(-11, -32, 3, 24); // left lock
+        ctx.fillRect(8, -32, 3, 24);  // right lock
       } else if (fighter.hairStyle === 'buns') {
-        ctx.beginPath();
-        ctx.arc(-10, -26, 5, 0, Math.PI * 2);
-        ctx.arc(10, -26, 5, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.fillRect(-10, -32, 20, 5); // top cap
+        ctx.fillRect(-12, -37, 5, 5);  // left bun
+        ctx.fillRect(7, -37, 5, 5);   // right bun
       }
 
-      // 3. Draw Gi body (White jacket)
+      // 3. Draw Gi body (White jacket - Blocky)
       ctx.strokeStyle = '#cbd5e1';
       ctx.fillStyle = '#ffffff';
       ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.ellipse(0, 5, torsoWidth, 18, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
+      ctx.fillRect(-torsoWidth, -11, torsoWidth * 2, 30);
+      ctx.strokeRect(-torsoWidth, -11, torsoWidth * 2, 30);
 
       // 4. Draw Belt (White belt as base preview)
       ctx.strokeStyle = '#7f8c8d'; // neutral White belt
@@ -144,15 +121,17 @@ export const CharacterCustomizer: React.FC<CharacterCustomizerProps> = ({
       ctx.lineTo(torsoWidth, 10);
       ctx.stroke();
 
-      // Knot
+      // Knot (Blocky)
       ctx.fillStyle = '#7f8c8d';
-      ctx.beginPath();
-      ctx.arc(0, 10, 3.5, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.fillRect(-3, 7, 6, 6); // Knot core
+      ctx.fillRect(-6, 10, 3, 8); // left tie
+      ctx.fillRect(3, 10, 3, 8);  // right tie
 
-      // Draw limbs (Waving arm)
+      // Draw limbs (Waving arm - Blocky style line settings)
       ctx.strokeStyle = fighter.skinColor;
-      ctx.lineWidth = 3;
+      ctx.lineWidth = 5.5;
+      ctx.lineCap = 'square';
+      ctx.lineJoin = 'miter';
       ctx.beginPath();
       // Left arm resting
       ctx.moveTo(-torsoWidth + 2, 0);
@@ -162,9 +141,9 @@ export const CharacterCustomizer: React.FC<CharacterCustomizerProps> = ({
       ctx.moveTo(torsoWidth - 2, 0);
       ctx.lineTo(16 + waveAngle, -8 + waveAngle * 0.5);
       // Legs
-      ctx.moveTo(-6, 20);
+      ctx.moveTo(-6, 19);
       ctx.lineTo(-10, 38);
-      ctx.moveTo(6, 20);
+      ctx.moveTo(6, 19);
       ctx.lineTo(10, 38);
       ctx.stroke();
 

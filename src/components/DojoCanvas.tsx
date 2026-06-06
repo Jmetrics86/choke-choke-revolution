@@ -493,14 +493,9 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
     const scaleFactor = Math.max(1.0, Math.min(width, height) / 170);
     ctx.scale(scaleFactor, scaleFactor);
 
-    // Dynamic tatami ground shadow
-    const shadowGrad = ctx.createRadialGradient(0, 40, 1, 0, 40, 60);
-    shadowGrad.addColorStop(0, 'rgba(0,0,0,0.55)');
-    shadowGrad.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = shadowGrad;
-    ctx.beginPath();
-    ctx.ellipse(0, 40, 60, 12, 0, 0, Math.PI * 2);
-    ctx.fill();
+    // Dynamic blocky tatami ground shadow (composed of rectangles)
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    ctx.fillRect(-35, 36, 70, 6);
 
     const getBeltHex = (color: FighterStyle['beltColor']): string => {
       switch (color) {
@@ -517,31 +512,31 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
 
     if (state.submission !== 'none') {
       if (state.submission === 'triangle_attempt') {
-        drawFighterSkeletal(ctx, -20, 25, 'horizontal', fighter, playerBelt);
-        drawFighterSkeletal(ctx, 10, 5, 'triangle_trapped', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt);
+        drawFighterSkeletal(ctx, -20, 25, 'horizontal', fighter, playerBelt, songTime, true);
+        drawFighterSkeletal(ctx, 10, 5, 'triangle_trapped', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt, songTime, false);
       } else if (state.submission === 'rnc_attempt') {
-        drawFighterSkeletal(ctx, -5, 15, 'back_seated', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt);
-        drawFighterSkeletal(ctx, -12, 5, 'choking_back', fighter, playerBelt);
+        drawFighterSkeletal(ctx, -5, 15, 'back_seated', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt, songTime, false);
+        drawFighterSkeletal(ctx, -12, 5, 'choking_back', fighter, playerBelt, songTime, true);
       } else if (state.submission === 'guillotine_attempt') {
-        drawFighterSkeletal(ctx, -15, 10, 'standing_choke', fighter, playerBelt);
-        drawFighterSkeletal(ctx, 15, 20, 'bent_neck', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt);
+        drawFighterSkeletal(ctx, -15, 10, 'standing_choke', fighter, playerBelt, songTime, true);
+        drawFighterSkeletal(ctx, 15, 20, 'bent_neck', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt, songTime, false);
       } else {
-        drawFighterSkeletal(ctx, 0, 30, 'horizontal', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt);
-        drawFighterSkeletal(ctx, -5, 5, 'mount_choke', fighter, playerBelt);
+        drawFighterSkeletal(ctx, 0, 30, 'horizontal', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt, songTime, false);
+        drawFighterSkeletal(ctx, -5, 5, 'mount_choke', fighter, playerBelt, songTime, true);
       }
     } else {
       if (state.position === 'guard') {
-        drawFighterSkeletal(ctx, -20, 25, 'horizontal', fighter, playerBelt);
-        drawFighterSkeletal(ctx, 10, 10, 'guard_top', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt);
+        drawFighterSkeletal(ctx, -20, 25, 'horizontal', fighter, playerBelt, songTime, true);
+        drawFighterSkeletal(ctx, 10, 10, 'guard_top', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt, songTime, false);
       } else if (state.position === 'side_control') {
-        drawFighterSkeletal(ctx, 0, 25, 'horizontal', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt);
-        drawFighterSkeletal(ctx, -5, 10, 'side_top', fighter, playerBelt);
+        drawFighterSkeletal(ctx, 0, 25, 'horizontal', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt, songTime, false);
+        drawFighterSkeletal(ctx, -5, 10, 'side_top', fighter, playerBelt, songTime, true);
       } else if (state.position === 'mount') {
-        drawFighterSkeletal(ctx, 0, 25, 'horizontal', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt);
-        drawFighterSkeletal(ctx, -2, -5, 'mount_top', fighter, playerBelt);
+        drawFighterSkeletal(ctx, 0, 25, 'horizontal', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt, songTime, false);
+        drawFighterSkeletal(ctx, -2, -5, 'mount_top', fighter, playerBelt, songTime, true);
       } else {
-        drawFighterSkeletal(ctx, 5, 20, 'seated', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt);
-        drawFighterSkeletal(ctx, -10, 15, 'back_hooks', fighter, playerBelt);
+        drawFighterSkeletal(ctx, 5, 20, 'seated', { gender: 'male', hairStyle: 'bald', hairColor: '#000', skinColor: '#9d4edd', beltColor: 'black' }, opponentBelt, songTime, false);
+        drawFighterSkeletal(ctx, -10, 15, 'back_hooks', fighter, playerBelt, songTime, true);
       }
     }
 
@@ -555,7 +550,9 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
     dy: number,
     pose: string,
     style: FighterStyle,
-    beltColorHex: string
+    beltColorHex: string,
+    songTime: number,
+    isPlayer = false
   ) => {
     ctx.save();
     ctx.translate(dx, dy);
@@ -592,6 +589,8 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       spineX = 15; spineY = 10;
       armLX = -15; armLY = 20;
       armRX = 5; armRY = -5;
+      legLX = 30; legLY = 18;
+      legRX = 25; legRY = 30;
     } else if (pose === 'mount_top') {
       headX = -2; headY = -35;
       spineX = 0; spineY = -10;
@@ -604,6 +603,8 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       spineX = 0; spineY = 10;
       armLX = -12; armLY = -10;
       armRX = 12; armRY = -10;
+      legLX = -14; legLY = 28;
+      legRX = 14; legRY = 28;
     } else if (pose === 'back_hooks') {
       headX = -5; headY = -32;
       spineX = -10; spineY = 5;
@@ -616,74 +617,165 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       spineX = 10; spineY = 15;
       armLX = -12; armLY = 22;
       armRX = 5; armRY = 5;
+      legLX = 22; legLY = 28;
+      legRX = 18; legRY = 34;
     } else if (pose === 'choking_back') {
       headX = -2; headY = -35;
       spineX = -8; spineY = 8;
       armLX = 15; armLY = -25;
       armRX = 2; armRY = -25;
+      legLX = -14; legLY = 25;
+      legRX = 14; legRY = 25;
+    } else if (pose === 'back_seated') {
+      headX = 4; headY = -28;
+      spineX = 0; spineY = 12;
+      armLX = -10; armLY = 5;
+      armRX = 10; armRY = 5;
+      legLX = -15; legLY = 20;
+      legRX = 15; legRY = 20;
+    } else if (pose === 'standing_choke') {
+      headX = -10; headY = -30;
+      spineX = 5; spineY = -2;
+      armLX = -15; armLY = -15;
+      armRX = -5; armRY = -15;
+      legLX = -10; legLY = 28;
+      legRX = 10; legRY = 28;
+    } else if (pose === 'bent_neck') {
+      headX = -18; headY = -12;
+      spineX = 8; spineY = 10;
+      armLX = -10; armLY = 20;
+      armRX = 12; armRY = 18;
+      legLX = 5; legLY = 32;
+      legRX = 15; legRY = 32;
+    } else if (pose === 'mount_choke') {
+      headX = -2; headY = -28;
+      spineX = 0; spineY = -5;
+      armLX = -8; armLY = 5;
+      armRX = 8; armRY = 5;
+      legLX = -18; legLY = 18;
+      legRX = 18; legRY = 18;
     }
 
-    ctx.fillStyle = style.skinColor;
-    ctx.beginPath();
-    ctx.arc(headX, headY, 8, 0, Math.PI * 2);
-    ctx.fill();
+    // Breathing/idle dynamics based on song bpm
+    const bpm = song ? song.bpm : 120;
+    const idleCycle = songTime * (bpm / 60) * Math.PI * 2;
+    const isChoking = matchStateRef.current.submission !== 'none';
 
+    // 1. Organic swaying (Idle breathing)
+    // Shift heads, spines, and arms slightly on the beat
+    const breathFactor = isChoking ? 0.2 : 1.0;
+    const headSway = Math.sin(idleCycle) * 1.5 * breathFactor;
+    const spineStretch = Math.cos(idleCycle) * 0.8 * breathFactor;
+    
+    headX += headSway;
+    headY += spineStretch;
+    spineY += spineStretch;
+    armLY += spineStretch * 0.5;
+    armRY += spineStretch * 0.5;
+
+    // 2. Submission Tension / Jitter
+    if (isChoking) {
+      // Create rapid adrenaline shakes in both characters when a choke is happening
+      const jitterX = (Math.random() - 0.5) * 2.5;
+      const jitterY = (Math.random() - 0.5) * 2.5;
+      headX += jitterX;
+      headY += jitterY;
+      armLX += jitterX;
+      armLY += jitterY;
+      armRX += jitterX;
+      armRY += jitterY;
+      legLX += jitterX;
+      legLY += jitterY;
+      legRX += jitterX;
+      legRY += jitterY;
+    }
+
+    // 3. Player Arrow Controls Interaction (Shrimp, Sprawl, Posture, Sweep)
+    if (isPlayer) {
+      const keys = activeKeysRef.current;
+      
+      if (keys.left) {
+        // SHRIMP escape animation: retract legs & push out arms to frame, torso slides back
+        spineX -= 6;
+        headX -= 4;
+        armLX -= 10; armLY -= 2;
+        armRX -= 8; armRY -= 2;
+        legLX += 8; legLY -= 6;
+        legRX += 8; legRY -= 8;
+      }
+      if (keys.down) {
+        // SPRAWL defense animation: drop torso low, extend legs straight and wide
+        spineY += 6;
+        headY += 4;
+        armLX -= 4; armLY += 2;
+        armRX += 4; armRY += 2;
+        legLX -= 12; legLY += 10;
+        legRX += 12; legRY += 10;
+      }
+      if (keys.up) {
+        // POSTURE control animation: sit upright, push hands down onto opponent
+        spineY -= 6;
+        headY -= 10;
+        armLX = spineX - 10; armLY = spineY + 12;
+        armRX = spineX + 10; armRY = spineY + 12;
+      }
+      if (keys.right) {
+        // SWEEP attack animation: rotating/swinging sweep legs, hands raised high in triumph
+        armLY -= 12; armRY -= 12;
+        const sweepPhase = Math.sin(songTime * 24);
+        legLX += sweepPhase * 14;
+        legRX += sweepPhase * 14;
+      }
+    }
+
+    // ─── Draw Character Sprite (Strictly squares and rectangles, no circles/curves) ───
+
+    // Head - perfect square
+    ctx.fillStyle = style.skinColor;
+    ctx.fillRect(headX - 8, headY - 8, 16, 16);
+
+    // Hair - pure blocky hairstyles (no circles/curves)
     ctx.fillStyle = style.hairColor;
     if (style.hairStyle === 'spiky') {
-      ctx.beginPath();
-      ctx.moveTo(headX - 8, headY - 4);
-      ctx.lineTo(headX - 12, headY - 14);
-      ctx.lineTo(headX - 4, headY - 8);
-      ctx.lineTo(headX, headY - 16);
-      ctx.lineTo(headX + 4, headY - 8);
-      ctx.lineTo(headX + 12, headY - 14);
-      ctx.lineTo(headX + 8, headY - 4);
-      ctx.fill();
+      ctx.fillRect(headX - 9, headY - 12, 3, 4);
+      ctx.fillRect(headX - 5, headY - 15, 3, 7);
+      ctx.fillRect(headX - 1, headY - 17, 3, 9);
+      ctx.fillRect(headX + 3, headY - 15, 3, 7);
+      ctx.fillRect(headX + 6, headY - 12, 3, 4);
     } else if (style.hairStyle === 'mohawk') {
-      ctx.beginPath();
-      ctx.moveTo(headX - 2, headY - 8);
-      ctx.lineTo(headX - 4, headY - 16);
-      ctx.lineTo(headX, headY - 18);
-      ctx.lineTo(headX + 4, headY - 16);
-      ctx.lineTo(headX + 2, headY - 8);
-      ctx.fill();
+      ctx.fillRect(headX - 2, headY - 18, 4, 11);
+      ctx.fillRect(headX - 1, headY - 20, 2, 2);
     } else if (style.hairStyle === 'afro') {
-      ctx.beginPath();
-      ctx.arc(headX, headY - 6, 8, 0, Math.PI * 2);
-      ctx.arc(headX - 6, headY - 3, 6, 0, Math.PI * 2);
-      ctx.arc(headX + 6, headY - 3, 6, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.fillRect(headX - 11, headY - 12, 22, 10); // center block
+      ctx.fillRect(headX - 8, headY - 15, 16, 3);   // top block
+      ctx.fillRect(headX - 11, headY - 7, 22, 7);   // side flare
     } else if (style.hairStyle === 'short') {
-      ctx.beginPath();
-      ctx.arc(headX, headY - 3, 9, Math.PI, 0);
-      ctx.fill();
+      ctx.fillRect(headX - 9, headY - 11, 18, 4); // top cap
+      ctx.fillRect(headX - 9, headY - 11, 3, 9);  // left sideburn
+      ctx.fillRect(headX + 6, headY - 11, 3, 9);  // right sideburn
     } else if (style.hairStyle === 'long') {
-      ctx.beginPath();
-      ctx.arc(headX, headY - 3, 9, Math.PI, 0);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(headX - 8, headY - 2);
-      ctx.quadraticCurveTo(headX - 12, headY + 12, headX - 6, headY + 16);
-      ctx.quadraticCurveTo(headX - 6, headY + 10, headX - 8, headY - 2);
-      ctx.fill();
+      ctx.fillRect(headX - 9, headY - 11, 18, 4); // top cap
+      ctx.fillRect(headX - 10, headY - 11, 3, 20); // left lock
+      ctx.fillRect(headX + 7, headY - 11, 3, 20);  // right lock
     } else if (style.hairStyle === 'buns') {
-      ctx.beginPath();
-      ctx.arc(headX - 8, headY - 8, 4, 0, Math.PI * 2);
-      ctx.arc(headX + 8, headY - 8, 4, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.fillRect(headX - 9, headY - 11, 18, 4);  // top cap
+      ctx.fillRect(headX - 11, headY - 15, 4, 4);  // left bun
+      ctx.fillRect(headX + 7, headY - 15, 4, 4);   // right bun
     }
 
+    // Torso - Blocky rectangle
     ctx.strokeStyle = style.skinColor === '#9d4edd' ? '#7209b7' : '#e2e8f0';
     ctx.fillStyle = style.skinColor === '#9d4edd' ? '#140c1e' : '#ffffff';
-    ctx.beginPath();
+    ctx.lineWidth = 1.5;
     if (pose === 'horizontal') {
-      ctx.ellipse(spineX - 10, spineY, 20, torsoWidth, 0, 0, Math.PI * 2);
+      ctx.fillRect(spineX - 20, spineY - torsoWidth, 40, torsoWidth * 2);
+      ctx.strokeRect(spineX - 20, spineY - torsoWidth, 40, torsoWidth * 2);
     } else {
-      ctx.ellipse(spineX, spineY - 10, torsoWidth, 18, 0, 0, Math.PI * 2);
+      ctx.fillRect(spineX - torsoWidth, spineY - 19, torsoWidth * 2, 32);
+      ctx.strokeRect(spineX - torsoWidth, spineY - 19, torsoWidth * 2, 32);
     }
-    ctx.fill();
-    ctx.stroke();
 
+    // Belt - thick line
     ctx.strokeStyle = beltColorHex;
     ctx.lineWidth = 4;
     ctx.beginPath();
@@ -696,17 +788,25 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
     }
     ctx.stroke();
 
+    // Belt Knot - blocky knots
     ctx.fillStyle = beltColorHex;
-    ctx.beginPath();
     if (pose === 'horizontal') {
-      ctx.arc(spineX - 5, spineY, 4, 0, Math.PI * 2);
+      ctx.fillRect(spineX - 8, spineY - 3, 6, 6);
+      // Ribbon ties
+      ctx.fillRect(spineX - 12, spineY - 5, 4, 4);
+      ctx.fillRect(spineX - 12, spineY + 1, 4, 4);
     } else {
-      ctx.arc(spineX, spineY - 2, 4, 0, Math.PI * 2);
+      ctx.fillRect(spineX - 3, spineY - 5, 6, 6);
+      // Ribbon ties
+      ctx.fillRect(spineX - 6, spineY - 2, 3, 8);
+      ctx.fillRect(spineX + 3, spineY - 2, 3, 8);
     }
-    ctx.fill();
 
+    // Limbs - blocky rectangular limbs
     ctx.strokeStyle = style.skinColor;
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 5.5; // Thicker, blockier limb joints
+    ctx.lineCap = 'square';
+    ctx.lineJoin = 'miter';
     ctx.beginPath();
     
     ctx.moveTo(spineX - torsoWidth + 2, spineY - 10);
