@@ -66,6 +66,12 @@ body, html {
   z-index: 10;
 }
 
+@media (max-width: 820px) {
+  .dojo-header {
+    padding: 6px 12px;
+  }
+}
+
 .logo-text {
   font-size: 20px;
   font-weight: 900;
@@ -74,6 +80,12 @@ body, html {
   color: #fff;
   text-shadow: 0 0 8px var(--neon-pink);
   margin: 0;
+}
+
+@media (max-width: 820px) {
+  .logo-text {
+    font-size: 13px !important;
+  }
 }
 
 .logo-text span {
@@ -92,6 +104,13 @@ body, html {
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--neon-yellow);
+}
+
+@media (max-width: 820px) {
+  .coach-box {
+    font-size: 9px !important;
+    padding: 3px 8px !important;
+  }
 }
 
 /* Layout screens */
@@ -339,13 +358,20 @@ body, html {
   padding-right: 5px;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .song-selector-screen {
     width: 95%;
     height: 95%;
+    padding: 12px;
+    gap: 10px;
   }
   .song-list-container {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+  .menu-screen {
+    padding: 15px;
+    margin: 10px;
   }
 }
 
@@ -428,6 +454,8 @@ body, html {
 @media (max-width: 820px) {
   .animation-panel {
     flex: 1;
+    height: auto;
+    min-height: 0;
     border-right: none;
     border-bottom: 3px solid var(--neon-purple);
   }
@@ -446,7 +474,9 @@ body, html {
 
 @media (max-width: 820px) {
   .rhythm-panel {
-    flex: 1.5;
+    flex: 1.4;
+    height: auto;
+    min-height: 0;
     align-items: stretch;
   }
 }
@@ -510,6 +540,7 @@ body, html {
 @media (max-width: 820px) {
   .mobile-touchpad {
     display: flex; /* Show on mobile! */
+    height: 90px;
   }
 }
 
@@ -541,11 +572,23 @@ body, html {
   margin-bottom: 2px;
 }
 
+@media (max-width: 820px) {
+  .touch-icon {
+    font-size: 18px;
+  }
+}
+
 .touch-label {
   font-size: 8px;
   font-weight: bold;
   letter-spacing: 0.5px;
   text-transform: uppercase;
+}
+
+@media (max-width: 820px) {
+  .touch-label {
+    font-size: 7.5px;
+  }
 }
 
 /* Arrow specific colors */
