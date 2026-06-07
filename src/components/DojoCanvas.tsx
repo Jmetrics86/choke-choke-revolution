@@ -907,15 +907,18 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
         ctx.shadowBlur = 9;
         ctx.shadowColor = colors[laneIndex];
 
-        // Draw note circle wrapper
+        // Draw note square wrapper (Blocky aesthetic)
         ctx.fillStyle = colors[laneIndex];
+        ctx.strokeStyle = '#ffffff'; // Added white border for high contrast
+        ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(x, y, 18, 0, Math.PI * 2);
+        ctx.fillRect(x - 18, y - 18, 36, 36);
+        ctx.strokeRect(x - 18, y - 18, 36, 36);
         ctx.fill();
 
-        // Draw icon overlay
-        ctx.fillStyle = '#000000';
-        ctx.font = 'bold 18px monospace';
+        // Draw icon overlay (Brighter contrast)
+        ctx.fillStyle = '#ffffff'; // White for better visibility against neon background
+        ctx.font = 'bold 20px monospace';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(icons[laneIndex], x, y);
