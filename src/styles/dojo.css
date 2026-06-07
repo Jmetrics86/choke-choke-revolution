@@ -67,6 +67,12 @@ body, html {
   overflow: hidden;
 }
 
+@media (max-width: 820px) {
+  .game-screen-container {
+    padding-bottom: 90px; /* Ensure bottom padding to accommodate absolute mobile-touchpad */
+  }
+}
+
 /* Dojo HUD Header */
 .dojo-header {
   padding: 10px 20px;
@@ -545,7 +551,7 @@ body, html {
   flex-direction: row;
   background: #0b0c10;
   border-top: 2px solid var(--neon-purple);
-  z-index: 10;
+  z-index: 20;
   pointer-events: auto;
   flex-shrink: 0;
 }
@@ -553,6 +559,9 @@ body, html {
 @media (max-width: 820px) {
   .mobile-touchpad {
     display: flex; /* Show on mobile! */
+    position: absolute;
+    bottom: 0;
+    left: 0;
     height: 90px;
   }
 }
