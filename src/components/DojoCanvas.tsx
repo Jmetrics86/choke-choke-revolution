@@ -285,12 +285,14 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
           // Hold note just completed! Assess success
           note.holdScoreCollected = true;
           
-          const isHoldingAtEnd = activeKeysRef.current[note.direction];
+          // Added 50ms buffer: if you release within 50ms of the end, it counts as a success.
+          const isHoldingAtEnd = activeKeysRef.current[note.direction] || (songTime <= holdEnd + 0.05);
           const success = !note.holdReleasedEarly && isHoldingAtEnd;
 
           // Award final big holding bonus on success!
-          const result = success ? 'oss' : 'meh';
-          const scoreAdd = success ? 250 : 0;
+          // Changed result to NOT be miss even on failure, to protect combo
+          const result = success ? 'oss' : 'good'; 
+          const scoreAdd = success ? 250 : 50;
           const color = success ? 'var(--neon-green)' : 'var(--neon-pink)';
 
           onNoteHit(note.direction, scoreAdd, result);
