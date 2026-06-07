@@ -199,7 +199,7 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
 
     // Find the earliest unhit note in the correct direction
     const note = song.notes.find(
-      (n) => !n.hit && n.direction === direction && Math.abs(n.time - songTime) < 0.20
+      (n) => !n.hit && n.direction === direction && Math.abs(n.time - songTime) < 0.30
     );
 
     if (note) {
@@ -210,7 +210,7 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       let scoreAdd = 50;
       let color = 'var(--neon-pink)';
 
-      if (diff <= 0.07) { // Widened from 0.045
+      if (diff <= 0.08) { // OSS window
         result = 'oss';
         scoreAdd = 200;
         color = 'var(--neon-green)';
@@ -219,7 +219,7 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
         if (Math.random() < 0.4) {
           audio.speakCoach("OSS!");
         }
-      } else if (diff <= 0.12) { // Widened from 0.09
+      } else if (diff <= 0.20) { // Widened Meh/Good window
         result = 'good';
         scoreAdd = 100;
         color = 'var(--neon-cyan)';
