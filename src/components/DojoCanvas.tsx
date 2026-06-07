@@ -346,13 +346,13 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       const songTime = song ? audio.getCurrentTime(state.calibrationOffset) : 0;
 
       // ─── 1. Draw Fighter Canvas ───
-      fCtx.fillStyle = '#0e0f14';
+      fCtx.fillStyle = '#f4f1ea'; // Organic background
       fCtx.fillRect(0, 0, fighterDim.width, fighterDim.height);
       drawDojoGrid(fCtx, songTime, fighterDim.width, fighterDim.height);
       drawBJJGrapplers(fCtx, songTime, state, fighterDim.width, fighterDim.height);
 
       // ─── 2. Draw Rhythm Canvas ───
-      rCtx.fillStyle = '#07080b';
+      rCtx.fillStyle = '#2d2d2d'; // Darker for gameplay contrast
       rCtx.fillRect(0, 0, rhythmDim.width, rhythmDim.height);
       drawRhythmHighway(rCtx, songTime, rhythmDim.width, rhythmDim.height);
       updateAndDrawParticles(rCtx);
@@ -425,18 +425,18 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
     ctx.restore();
   };
 
-  // Draw full-canvas cyber dojo grid
+  // Draw full-canvas organic dojo grid
   const drawDojoGrid = (ctx: CanvasRenderingContext2D, songTime: number, width: number, height: number) => {
     ctx.save();
     
     const grad = ctx.createLinearGradient(0, 0, 0, height);
-    grad.addColorStop(0, '#090a0f');
-    grad.addColorStop(1, '#12131c');
+    grad.addColorStop(0, '#e8e4db'); // Warm stone
+    grad.addColorStop(1, '#dcd9ce'); // Lighter stone
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, width, height);
 
     const pulse = Math.sin(songTime * Math.PI * 2) * 0.5 + 0.5;
-    ctx.strokeStyle = `rgba(114, 9, 183, ${0.12 + pulse * 0.08})`;
+    ctx.strokeStyle = `rgba(184, 192, 168, ${0.3 + pulse * 0.2})`; // Muted sage green
     ctx.lineWidth = 1;
 
     const lineCount = 10;
