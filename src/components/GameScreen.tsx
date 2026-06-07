@@ -56,6 +56,14 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   // Handle a timed note Hit
   const handleNoteHit = (direction: DDRDirection, scoreAdd: number, result: 'oss' | 'good' | 'meh') => {
     audio.playSFX(result); // Play dynamic hits SFX!
+    
+    // Tactile Feedback for Mobile
+    if (navigator.vibrate) {
+      if (result === 'oss') navigator.vibrate(20);
+      else if (result === 'good') navigator.vibrate(15);
+      else navigator.vibrate(40); // Stronger vibrate for misses
+    }
+
     setMatchState((prev) => {
       const nextCombo = prev.comboCount + 1;
       const nextMaxCombo = Math.max(prev.maxCombo, nextCombo);
@@ -79,6 +87,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
   // Handle a Miss / Ghost tap
   const handleNoteMiss = () => {
+    if (navigator.vibrate) navigator.vibrate(60);
     setMatchState((prev) => {
       // Register miss in BJJ state machine
       const { nextState, message } = grappling.registerMiss(prev);
