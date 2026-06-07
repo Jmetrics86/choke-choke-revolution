@@ -66,19 +66,19 @@ export class GrapplingEngine {
     if (nextState.submission !== 'none') {
       if (nextState.isPlayerAttacking) {
         // Player is squeezing! Squeezing notes pulls chokeMeter closer to 0 (Opponent taps)
-        nextState.chokeMeter = Math.max(0, nextState.chokeMeter - 6);
+        nextState.chokeMeter = Math.max(0, nextState.chokeMeter - 10); // More effective hits
         audio.playSFX('strain');
 
         if (nextState.chokeMeter === 0) {
           nextState.gameStatus = 'victory';
           nextState.submission = 'none';
-          message = "OPPONENT TAPPED! FLawless submission! 🏆 Victory!";
+          message = "OPPONENT TAPPED! Flawless submission! 🏆 Victory!";
           audio.playSFX('tap');
           audio.speakCoach("He tapped! Beautiful submission! You are a master!");
         }
       } else {
         // Player is defending a choke! Hitting notes pushes chokeMeter closer to 50 (Escape back to neutral)
-        nextState.chokeMeter = Math.max(50, nextState.chokeMeter - 5);
+        nextState.chokeMeter = Math.max(50, nextState.chokeMeter - 8); // Easier escapes
         audio.playSFX('strain');
 
         if (nextState.chokeMeter === 50) {
@@ -102,8 +102,8 @@ export class GrapplingEngine {
         // Trigger offensive Submission hold!
         nextState.submission = combo.stateToTrigger;
         nextState.isPlayerAttacking = true;
-        // Move choke meter to 60 (player wants to push it to 0 to secure the tap out)
-        nextState.chokeMeter = 60; 
+        // Move choke meter to 45 (slightly closer to player victory than 60)
+        nextState.chokeMeter = 45; 
         message = combo.shout;
         audio.speakCoach(combo.shout);
         audio.playSFX('sweep');
@@ -147,7 +147,7 @@ export class GrapplingEngine {
     let message: string | null = null;
 
     // A miss always pushes the Choke Meter closer to 100 (Defeat)
-    nextState.chokeMeter = Math.min(100, nextState.chokeMeter + 8);
+    nextState.chokeMeter = Math.min(100, nextState.chokeMeter + 4); // Less punishing miss
     audio.playSFX('miss');
 
     // Reset combos
