@@ -267,7 +267,9 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
 
         if (songTime >= note.time && songTime <= holdEnd) {
           // Player must actively keep the key pressed!
-          const isHolding = activeKeysRef.current[note.direction];
+          // Add 50ms buffer: if user releases within 50ms of end, treat as still holding
+          const isHolding = activeKeysRef.current[note.direction] || (songTime >= holdEnd - 0.05);
+          
           if (isHolding && !note.holdReleasedEarly) {
             // Success holding! Spawn electrical sparks!
             const laneIndex = directions.indexOf(note.direction);
