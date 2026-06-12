@@ -34,7 +34,7 @@ export interface BeatNote {
 export interface SongBlueprint {
   id: string;
   title: string;
-  genre: 'Tatami Techno' | 'BJJ Funk' | 'Jiujitsu Synthwave' | 'Tap-Out Speedcore';
+  genre: string;
   bpm: number;
   duration: number; // in seconds
   coverArt: string; // SVG string representing the banana artwork
