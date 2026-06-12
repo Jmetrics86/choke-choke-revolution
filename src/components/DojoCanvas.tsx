@@ -371,8 +371,8 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       if (song && state.gameStatus === 'playing') {
         const targetY = getTargetY(rhythmDim.height);
         song.notes.forEach((note) => {
-          // If normal note or hold head passes without tapping, register miss
-          const gracePeriod = note.isHold ? 0.18 : 0.16;
+          // If normal note or hold head passes the hit window without tapping, register miss
+          const gracePeriod = 0.30; // Matches hit window of 0.30s
           if (!note.hit && songTime > note.time + gracePeriod) {
             note.hit = true;
             note.hitResult = 'miss';

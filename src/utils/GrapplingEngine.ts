@@ -152,6 +152,7 @@ export class GrapplingEngine {
 
     // Reset combos
     nextState.comboCount = 0;
+    this.clearBuffer();
 
     // 1. If currently inside an active choke defense, missing notes speeds up tapping out!
     if (nextState.submission !== 'none' && !nextState.isPlayerAttacking) {

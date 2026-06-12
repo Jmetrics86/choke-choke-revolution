@@ -37,6 +37,9 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
   // Start synthesizing the song when screen loads
   useEffect(() => {
+    // Clear BJJ combo input buffer
+    grappling.clearBuffer();
+
     // Reset song notes hit status
     song.notes.forEach((n) => {
       n.hit = false;
@@ -107,6 +110,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   };
 
   const restartMatch = () => {
+    grappling.clearBuffer(); // Clear BJJ combo input buffer
     setMatchState({
       position: 'guard',
       submission: 'none',
