@@ -143,7 +143,7 @@ export function generateBeatmap(bpm: number, duration: number, style: string): B
 export function generateBananaCoverArt(songId: string, title: string): string {
   let innerArt = '';
   
-  if (songId === 'guard-passer') {
+  if (songId === 'banana-footlock') {
     // Classic Rock: A banana rocking out on a guitar while passing guard
     innerArt = `
       <!-- Background Dojo Lines -->
@@ -171,7 +171,7 @@ export function generateBananaCoverArt(songId: string, title: string): string {
       <line x1="40" y1="50" x2="55" y2="55" stroke="#00f5d4" stroke-width="1.5" />
       <line x1="45" y1="70" x2="58" y2="72" stroke="#00f5d4" stroke-width="1.5" />
     `;
-  } else if (songId === 'banana-footlock') {
+  } else if (songId === 'guard-passer') {
     // Country: A banana wearing a cowboy hat applying a footlock
     innerArt = `
       <!-- Background Country/Western Grid -->
@@ -273,27 +273,25 @@ export function getGNBSongLibrary(): SongBlueprint[] {
   return [
     {
       id: 'guard-passer',
-      title: "Guard Passer's Anthem",
-      genre: 'Grappling Rock',
-      bpm: 125,
-      duration: 180, // 3 minutes (average BJJ roll)
-      coverArt: generateBananaCoverArt('guard-passer', "Guard Passer's Anthem"),
-      // Heavy rock riffs chord basslines
-      bassNotes: ['A2', 'A2', 'G2', 'G2', 'D2', 'D2', 'A2', 'E2'],
-      leadNotes: ['A4', 'C5', 'D5', 'D#5', 'D5', 'C5', 'A4', 'G4'],
-      notes: generateBeatmap(125, 180, 'techno'),
-    },
-    {
-      id: 'banana-footlock',
       title: 'The Ballad of the Blue Belt',
       genre: 'Country & Tatami',
       bpm: 110,
       duration: 180, // 3 minutes (average BJJ roll)
-      coverArt: generateBananaCoverArt('banana-footlock', 'The Ballad of the Blue Belt'),
-      // Traditional alternating major country bass
-      bassNotes: ['G2', 'D2', 'G2', 'D2', 'C2', 'G2', 'D2', 'G2'],
-      leadNotes: ['B3', 'D4', 'G4', 'A4', 'B4', 'G4', 'D4', 'B3'],
+      coverArt: generateBananaCoverArt('guard-passer', 'The Ballad of the Blue Belt'),
+      bassNotes: ["G2","D2","G2","D2","C2","G2","C2","G2","G2","D2","G2","D2","D2","A2","D2","A2","G2","D2","G2","D2","C2","G2","C2","G2","G2","D2","G2","D2","D2","D2","G2","D2","C2","G2","C2","G2","G2","D2","G2","D2","D2","A2","D2","A2","G2","D2","G2","D2","C2","G2","C2","G2","G2","D2","G2","D2","D2","A2","D2","A2","G2","D2","G2","G2","G2","D2","G2","D2","C2","G2","C2","G2","G2","D2","G2","D2","D2","A2","D2","A2","G2","D2","G2","D2","C2","G2","C2","G2","G2","D2","G2","D2","D2","D2","G2","D2","C2","G2","C2","G2","G2","D2","G2","D2","D2","A2","D2","A2","G2","D2","G2","D2","C2","G2","C2","G2","G2","D2","G2","D2","D2","A2","D2","A2","G2","D2","G2","G2"],
+      leadNotes: ["B3","D4","G4","B4","C4","E4","G4","C5","B3","D4","G4","B4","A3","C#4","E4","A4","B3","D4","G4","B4","C4","E4","G4","C5","B3","D4","G4","B4","A3","C4","F#4","D4","C4","E4","G4","C5","B3","D4","G4","B4","A3","C#4","E4","A4","B3","D4","G4","B4","C4","E4","G4","C5","B3","D4","G4","B4","A3","C4","F#4","D4","G3","B3","D4","G4","B3","D4","G4","B4","C4","E4","G4","C5","B3","D4","G4","B4","A3","C#4","E4","A4","B3","D4","G4","B4","C4","E4","G4","C5","B3","D4","G4","B4","A3","C4","F#4","D4","C4","E4","G4","C5","B3","D4","G4","B4","A3","C#4","E4","A4","B3","D4","G4","B4","C4","E4","G4","C5","B3","D4","G4","B4","A3","C4","F#4","D4","G3","B3","D4","G4"],
       notes: generateBeatmap(110, 180, 'funk'),
+    },
+    {
+      id: 'banana-footlock',
+      title: "Guard Passer's Anthem",
+      genre: 'Grappling Rock',
+      bpm: 125,
+      duration: 180, // 3 minutes (average BJJ roll)
+      coverArt: generateBananaCoverArt('banana-footlock', "Guard Passer's Anthem"),
+      bassNotes: ["A2","A2","G2","G2","D2","D2","A2","A2","A2","A2","G2","G2","D2","D2","E2","E2","A2","A2","G2","G2","D2","D2","A2","A2","A2","A2","G2","G2","D2","D2","A2","A2","F2","F2","G2","G2","A2","A2","A2","A2","F2","F2","G2","G2","A2","A2","E2","E2","F2","F2","G2","G2","A2","A2","A2","A2","F2","F2","G2","G2","E2","E2","E2","E2","A2","A2","G2","G2","D2","D2","A2","A2","A2","A2","G2","G2","D2","D2","E2","E2","A2","A2","G2","G2","D2","D2","A2","A2","A2","A2","G2","G2","D2","D2","A2","A2","F2","F2","G2","G2","A2","A2","A2","A2","F2","F2","G2","G2","A2","A2","E2","E2","F2","F2","G2","G2","A2","A2","A2","A2","F2","F2","G2","G2","E2","E2","E2","E2"],
+      leadNotes: ["A4","C5","D5","A4","G4","Bb4","C5","G4","D4","F4","G4","D4","A4","C5","D5","E5","A4","C5","D5","A4","G4","Bb4","C5","G4","D4","F4","G4","D4","A4","E4","G4","A4","F4","A4","C5","F5","G4","B4","D5","G5","A4","C5","E5","A5","A4","G4","E4","D4","F4","A4","C5","F5","G4","B4","D5","G5","E4","G4","B4","E5","E5","D5","B4","G4","A4","C5","D5","A4","G4","Bb4","C5","G4","D4","F4","G4","D4","A4","C5","D5","E5","A4","C5","D5","A4","G4","Bb4","C5","G4","D4","F4","G4","D4","A4","E4","G4","A4","F4","A4","C5","F5","G4","B4","D5","G5","A4","C5","E5","A5","A4","G4","E4","D4","F4","A4","C5","F5","G4","B4","D5","G5","E4","G4","B4","E5","E5","D5","B4","G4"],
+      notes: generateBeatmap(125, 180, 'techno'),
     },
     {
       id: 'berimbolo-samba',
@@ -302,9 +300,8 @@ export function getGNBSongLibrary(): SongBlueprint[] {
       bpm: 90,
       duration: 180, // 3 minutes (average BJJ roll)
       coverArt: generateBananaCoverArt('berimbolo-samba', 'Straight Outta Guard'),
-      // Deep syncopated sub bass
-      bassNotes: ['C2', 'Eb2', 'C2', 'Bb1', 'C2', 'Eb2', 'F2', 'G2'],
-      leadNotes: ['C4', 'C4', 'G4', 'Eb4', 'C4', 'C4', 'Bb3', 'C4'],
+      bassNotes: ["C2","C2","Eb2","Eb2","C2","C2","Bb1","Bb1","C2","C2","Eb2","Eb2","F2","F2","G2","G2","C2","C2","Eb2","Eb2","C2","C2","Bb1","Bb1","C2","C2","Eb2","Eb2","F2","F2","C2","C2","Ab2","Ab2","Bb2","Bb2","C2","C2","C2","C2","Ab2","Ab2","Bb2","Bb2","Eb2","Eb2","G2","G2","Ab2","Ab2","Bb2","Bb2","C2","C2","C2","C2","Ab2","Ab2","Bb2","Bb2","G2","G2","C2","C2","C2","C2","Eb2","Eb2","C2","C2","Bb1","Bb1","C2","C2","Eb2","Eb2","F2","F2","G2","G2","C2","C2","Eb2","Eb2","C2","C2","Bb1","Bb1","C2","C2","Eb2","Eb2","F2","F2","C2","C2","Ab2","Ab2","Bb2","Bb2","C2","C2","C2","C2","Ab2","Ab2","Bb2","Bb2","Eb2","Eb2","G2","G2","Ab2","Ab2","Bb2","Bb2","C2","C2","C2","C2","Ab2","Ab2","Bb2","Bb2","G2","G2","C2","C2"],
+      leadNotes: ["C4","C4","Eb4","G4","C4","C4","Bb3","D4","C4","C4","Eb4","G4","F4","F4","G4","Bb4","C4","C4","Eb4","G4","C4","C4","Bb3","D4","C4","C4","Eb4","G4","F4","G4","C4","Eb4","Ab4","C5","Eb5","Ab5","Bb4","D5","F5","Bb5","C4","Eb4","G4","C5","C5","Bb4","G4","Eb4","Ab4","C5","Eb5","Ab5","Bb4","D5","F5","Bb5","G4","B4","D5","G5","C4","Eb4","G4","C5","C4","C4","Eb4","G4","C4","C4","Bb3","D4","C4","C4","Eb4","G4","F4","F4","G4","Bb4","C4","C4","Eb4","G4","C4","C4","Bb3","D4","C4","C4","Eb4","G4","F4","G4","C4","Eb4","Ab4","C5","Eb5","Ab5","Bb4","D5","F5","Bb5","C4","Eb4","G4","C5","C5","Bb4","G4","Eb4","Ab4","C5","Eb5","Ab5","Bb4","D5","F5","Bb5","G4","B4","D5","G5","C4","Eb4","G4","C5"],
       notes: generateBeatmap(90, 180, 'funk'),
     },
     {
@@ -314,9 +311,8 @@ export function getGNBSongLibrary(): SongBlueprint[] {
       bpm: 165,
       duration: 180, // 3 minutes (average BJJ roll)
       coverArt: generateBananaCoverArt('tap-out-speedcore', 'Chokehold Carnage'),
-      // Chromatic rapid thrash riffs
-      bassNotes: ['E2', 'F2', 'E2', 'G2', 'E2', 'Bb2', 'A2', 'G#2'],
-      leadNotes: ['E4', 'F4', 'E4', 'G4', 'Bb4', 'A4', 'G#4', 'E4'],
+      bassNotes: ["E2","F2","E2","G2","E2","Bb2","A2","G#2","E2","F2","E2","G2","E2","Bb2","C3","B2","E2","F2","E2","G2","E2","Bb2","A2","G#2","E2","F2","E2","G2","F2","G2","E2","E2","E2","E2","E2","E2","G2","G2","G2","G2","C2","C2","C2","C2","B1","B1","B1","B1","E2","E2","E2","E2","G2","G2","G2","G2","C2","C2","C2","C2","Bb1","Bb1","B1","B1","E2","F2","E2","G2","E2","Bb2","A2","G#2","E2","F2","E2","G2","E2","Bb2","C3","B2","E2","F2","E2","G2","E2","Bb2","A2","G#2","E2","F2","E2","G2","F2","G2","E2","E2","E2","E2","E2","E2","G2","G2","G2","G2","C2","C2","C2","C2","B1","B1","B1","B1","E2","E2","E2","E2","G2","G2","G2","G2","C2","C2","C2","C2","Bb1","Bb1","B1","B1"],
+      leadNotes: ["E4","F4","E4","G4","Bb4","A4","G#4","E4","E4","F4","E4","G4","Bb4","C5","B4","G4","E4","F4","E4","G4","Bb4","A4","G#4","E4","E4","F4","E4","G4","F4","G4","E4","F4","E4","G4","B4","E5","G4","B4","D5","G5","C4","E4","G4","C5","B3","D4","F#4","B4","E4","G4","B4","E5","G4","B4","D5","G5","C4","E4","G4","C5","Bb3","D4","F4","Bb4","E4","F4","E4","G4","Bb4","A4","G#4","E4","E4","F4","E4","G4","Bb4","C5","B4","G4","E4","F4","E4","G4","Bb4","A4","G#4","E4","E4","F4","E4","G4","F4","G4","E4","F4","E4","G4","B4","E5","G4","B4","D5","G5","C4","E4","G4","C5","B3","D4","F#4","B4","E4","G4","B4","E5","G4","B4","D5","G5","C4","E4","G4","C5","Bb3","D4","F4","Bb4"],
       notes: generateBeatmap(165, 180, 'speedcore'),
     },
   ];

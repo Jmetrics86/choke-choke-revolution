@@ -198,7 +198,7 @@ export class AudioEngine {
     const subdivision = 0.25; // 16th notes
     this.nextNoteTime += subdivision * secondsPerBeat;
 
-    this.currentBeatIndex = (this.currentBeatIndex + 1) % 16; // loop 16 beats
+    this.currentBeatIndex = this.currentBeatIndex + 1; // grow indefinitely to play long songs
   }
 
   // Scheduled sequencer beats inside lookahead window

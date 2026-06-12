@@ -119,6 +119,9 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
   // Keyboard controls listener (Desktop support)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Ensure audio context is initialized/resumed on user gesture
+      audio.init();
+
       if (matchStateRef.current.gameStatus !== 'playing' || !song) return;
 
       let direction: DDRDirection | null = null;
@@ -193,6 +196,9 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
 
   // Attempt to hit scrolling note on keyboard press or mobile tap
   const handleHitAttempt = (direction: DDRDirection) => {
+    // Ensure audio context is initialized/resumed on user gesture
+    audio.init();
+
     if (!song) return;
     const songTime = audio.getCurrentTime(matchStateRef.current.calibrationOffset);
     const targetY = getTargetY(rhythmDim.height);
