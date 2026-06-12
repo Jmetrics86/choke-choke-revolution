@@ -64,9 +64,13 @@ export class GrapplingEngine {
 
     // 1. If currently in an ACTIVE submission attempt (Attacking or Defending)
     if (nextState.submission !== 'none') {
+      // Combo multiplier for submissions: +10% effectiveness for every 5 combo hits
+      const comboMultiplier = 1 + Math.floor(nextState.comboCount / 5) * 0.1;
+
       if (nextState.isPlayerAttacking) {
         // Player is squeezing! Squeezing notes pulls chokeMeter closer to 0 (Opponent taps)
-        nextState.chokeMeter = Math.max(0, nextState.chokeMeter - 10); // More effective hits
+        const squeezeAmount = Math.round(10 * comboMultiplier);
+        nextState.chokeMeter = Math.max(0, nextState.chokeMeter - squeezeAmount); // More effective hits
         audio.playSFX('strain');
 
         if (nextState.chokeMeter === 0) {
@@ -78,7 +82,8 @@ export class GrapplingEngine {
         }
       } else {
         // Player is defending a choke! Hitting notes pushes chokeMeter closer to 50 (Escape back to neutral)
-        nextState.chokeMeter = Math.max(50, nextState.chokeMeter - 8); // Easier escapes
+        const escapeAmount = Math.round(8 * comboMultiplier);
+        nextState.chokeMeter = Math.max(50, nextState.chokeMeter - escapeAmount); // Easier escapes
         audio.playSFX('strain');
 
         if (nextState.chokeMeter === 50) {
@@ -114,7 +119,9 @@ export class GrapplingEngine {
 
     // 3. Normal Position Progression: Accumulate score to advance positions
     // Advance position every 10 hit-combos (or on a sweep direction)
-    if (nextState.comboCount > 0 && nextState.comboCount % 12 === 0 && direction === 'right') {
+    const isSweep = direction === 'right';
+    const isComboMilestone = nextState.comboCount > 0 && nextState.comboCount % 10 === 0;
+    if (isSweep || isComboMilestone) {
       const positions: GrapplingPosition[] = ['guard', 'side_control', 'mount', 'back_control'];
       const currentIndex = positions.indexOf(nextState.position);
       if (currentIndex < positions.length - 1) {

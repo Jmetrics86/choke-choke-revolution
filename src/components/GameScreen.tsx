@@ -70,7 +70,9 @@ export const GameScreen: React.FC<GameScreenProps> = ({
     setMatchState((prev) => {
       const nextCombo = prev.comboCount + 1;
       const nextMaxCombo = Math.max(prev.maxCombo, nextCombo);
-      const nextScore = prev.score + scoreAdd;
+      // Combo multiplier for score: +20% score for every 10 combo hits
+      const comboMultiplier = 1 + Math.floor(nextCombo / 10) * 0.2;
+      const nextScore = prev.score + Math.round(scoreAdd * comboMultiplier);
 
       // Register hit in BJJ state machine
       const { nextState, message } = grappling.registerHit(direction, {

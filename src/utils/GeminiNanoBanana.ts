@@ -268,45 +268,45 @@ export function getGNBSongLibrary(): SongBlueprint[] {
       title: "Guard Passer's Nightmare",
       genre: 'Tatami Techno',
       bpm: 135,
-      duration: 120, // 2 minutes
+      duration: 180, // 3 minutes (average BJJ roll)
       coverArt: generateBananaCoverArt('guard-passer', "Guard Passer's Nightmare"),
       // Sequenced notes for the synthesizer to read (e.g. C2, Eb2, F2, G2)
       bassNotes: ['C2', 'C2', 'Eb2', 'Eb2', 'F2', 'F2', 'G2', 'Bb2'],
       leadNotes: ['C4', 'Eb4', 'F4', 'G4', 'Bb4', 'C5', 'Bb4', 'G4'],
-      notes: generateBeatmap(135, 120, 'techno'),
+      notes: generateBeatmap(135, 180, 'techno'),
     },
     {
       id: 'banana-footlock',
       title: 'Slippery Banana Footlock',
       genre: 'BJJ Funk',
       bpm: 112,
-      duration: 120,
+      duration: 180, // 3 minutes (average BJJ roll)
       coverArt: generateBananaCoverArt('banana-footlock', 'Slippery Banana Footlock'),
       bassNotes: ['F2', 'F2', 'Ab2', 'Bb2', 'C3', 'C3', 'Eb3', 'F2'],
       leadNotes: ['F4', 'Ab4', 'Bb4', 'C5', 'Eb5', 'C5', 'Bb4', 'Ab4'],
-      notes: generateBeatmap(112, 120, 'funk'),
+      notes: generateBeatmap(112, 180, 'funk'),
     },
     {
       id: 'berimbolo-samba',
       title: 'Berimbolo Samba',
       genre: 'Jiujitsu Synthwave',
       bpm: 142,
-      duration: 120,
+      duration: 180, // 3 minutes (average BJJ roll)
       coverArt: generateBananaCoverArt('berimbolo-samba', 'Berimbolo Samba'),
       bassNotes: ['A2', 'A2', 'C3', 'D3', 'E3', 'E3', 'G3', 'A2'],
       leadNotes: ['A4', 'C5', 'D5', 'E5', 'G5', 'E5', 'D5', 'C5'],
-      notes: generateBeatmap(142, 120, 'synthwave'),
+      notes: generateBeatmap(142, 180, 'synthwave'),
     },
     {
       id: 'tap-out-speedcore',
       title: 'Tap-Out Speedcore',
       genre: 'Tap-Out Speedcore',
       bpm: 172,
-      duration: 120,
+      duration: 180, // 3 minutes (average BJJ roll)
       coverArt: generateBananaCoverArt('tap-out-speedcore', 'Tap-Out Speedcore'),
       bassNotes: ['E2', 'E2', 'G2', 'A2', 'B2', 'B2', 'D3', 'E2'],
       leadNotes: ['E4', 'G4', 'A4', 'B4', 'D5', 'B4', 'A4', 'G4'],
-      notes: generateBeatmap(172, 120, 'speedcore'),
+      notes: generateBeatmap(172, 180, 'speedcore'),
     },
   ];
 }
