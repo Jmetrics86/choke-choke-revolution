@@ -234,13 +234,16 @@ export class GrapplingEngine {
 
   // Check if target sequence ends the input buffer
   private isComboInHistory(sequence: DDRDirection[]): boolean {
-    if (this.inputBuffer.length < sequence.length) return false;
-    
-    const slice = this.inputBuffer.slice(-sequence.length);
-    for (let i = 0; i < sequence.length; i++) {
-      if (slice[i] !== sequence[i]) return false;
+    let seqIndex = 0;
+    for (const dir of this.inputBuffer) {
+      if (dir === sequence[seqIndex]) {
+        seqIndex++;
+        if (seqIndex === sequence.length) {
+          return true;
+        }
+      }
     }
-    return true;
+    return false;
   }
 }
 export const grappling = new GrapplingEngine();
