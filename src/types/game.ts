@@ -41,6 +41,7 @@ export interface SongBlueprint {
   bassNotes: string[]; // Notes for synthesis like C2, E2, G2
   leadNotes: string[]; // Notes for melody like C4, D4, E4
   notes: BeatNote[];
+  audioUrl?: string; // Optional path to MP3 file, e.g. "/tracks/rock.mp3"
 }
 
 export interface MatchState {

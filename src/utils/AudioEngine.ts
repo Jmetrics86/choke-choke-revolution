@@ -16,6 +16,10 @@ export class AudioEngine {
   private bpm: number = 120;
   private currentSong: SongBlueprint | null = null;
   
+  // MP3 playback support properties
+  private activeSource: AudioBufferSourceNode | null = null;
+  private loadedAudioBuffer: AudioBuffer | null = null;
+  
   // Scheduler variables
   private schedulerTimer: number | null = null;
   private nextNoteTime: number = 0.0;
@@ -205,6 +209,11 @@ export class AudioEngine {
   private scheduleNote(beatIndex: number, time: number) {
     if (!this.currentSong) return;
 
+    // If playing a pre-recorded audio track, mute the synthesizer beats to avoid clashing
+    if (this.loadedAudioBuffer) {
+      return;
+    }
+
     const notesCount = this.currentSong.bassNotes.length;
     const bassNote = this.currentSong.bassNotes[beatIndex % notesCount];
     const leadNote = this.currentSong.leadNotes[(beatIndex + 3) % notesCount];
@@ -248,18 +257,54 @@ export class AudioEngine {
     }
   }
 
-  // Begins song synthesizer playback
-  public play(song: SongBlueprint) {
+  // Helper to fetch and decode MP3 files
+  private async loadAudioFile(url: string): Promise<AudioBuffer> {
+    if (!this.ctx) throw new Error("AudioContext not initialized");
+    const response = await fetch(url);
+    const arrayBuffer = await response.arrayBuffer();
+    return await this.ctx.decodeAudioData(arrayBuffer);
+  }
+
+  // Begins song synthesizer playback or MP3 playback
+  public async play(song: SongBlueprint) {
     if (this.isPlaying) return;
     this.currentSong = song;
     this.bpm = song.bpm;
     this.isPlaying = true;
 
-    if (!this.ctx) return;
+    await this.init();
+    if (!this.ctx || !this.masterGainNode) return;
     
     this.startTime = this.ctx.currentTime;
     this.nextNoteTime = this.ctx.currentTime + 0.1;
     this.currentBeatIndex = 0;
+
+    if (song.audioUrl) {
+      try {
+        console.log(`Loading audio file from: ${song.audioUrl}`);
+        const buffer = await this.loadAudioFile(song.audioUrl);
+        
+        // Check if player stopped the song while it was loading
+        if (!this.isPlaying || this.currentSong?.id !== song.id) return;
+
+        this.loadedAudioBuffer = buffer;
+        const source = this.ctx.createBufferSource();
+        source.buffer = buffer;
+        source.connect(this.masterGainNode);
+        
+        // Re-align starting time
+        this.startTime = this.ctx.currentTime;
+        this.nextNoteTime = this.ctx.currentTime + 0.1;
+        
+        source.start(0);
+        this.activeSource = source;
+        console.log("MP3 playback started successfully!");
+      } catch (err) {
+        console.error("Failed to load MP3 track, falling back to synthesizer:", err);
+        this.activeSource = null;
+        this.loadedAudioBuffer = null;
+      }
+    }
 
     // Start timer interval (using window.setInterval which runs safely on main thread)
     this.schedulerTimer = window.setInterval(() => this.scheduler(), this.lookahead);
@@ -272,6 +317,15 @@ export class AudioEngine {
       clearInterval(this.schedulerTimer);
       this.schedulerTimer = null;
     }
+    if (this.activeSource) {
+      try {
+        this.activeSource.stop();
+      } catch (e) {
+        // Already stopped
+      }
+      this.activeSource = null;
+    }
+    this.loadedAudioBuffer = null;
     this.currentSong = null;
   }
 
