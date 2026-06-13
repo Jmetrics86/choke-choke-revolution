@@ -51,16 +51,22 @@ export const GameScreen: React.FC<GameScreenProps> = ({
     selectedSongId: song.id,
     calibrationOffset,
     mistakes: 0,
+    coachMsg: "Breathe. Frame. Watch his posture.",
   });
 
-  const [coachMsg, setCoachMsg] = useState<string>("Breathe. Frame. Watch his posture.");
+  const matchStateRef = useRef(matchState);
+  useEffect(() => {
+    matchStateRef.current = matchState;
+  }, [matchState]);
+
+  const coachMsg = matchState.coachMsg || "Breathe. Frame. Watch his posture.";
   const [activeButton, setActiveButton] = useState<DDRDirection | null>(null);
   const canvasRef = useRef<DojoCanvasRef>(null);
 
   // Subscribe to Audio Engine Coach Speech events to update UI bubble
   useEffect(() => {
     const unsubscribe = audio.subscribeCoach((msg) => {
-      setCoachMsg(msg);
+      setMatchState((prev) => ({ ...prev, coachMsg: msg }));
     });
     return () => {
       unsubscribe();
@@ -114,11 +120,10 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         score: nextScore,
       });
 
-      if (message) {
-        setCoachMsg(message);
-      }
-
-      return nextState;
+      return {
+        ...nextState,
+        coachMsg: message || prev.coachMsg
+      };
     });
   };
 
@@ -129,15 +134,12 @@ export const GameScreen: React.FC<GameScreenProps> = ({
       // Register miss in BJJ state machine
       const { nextState, message } = grappling.registerMiss(prev);
 
-      if (message) {
-        setCoachMsg(message);
-      } else {
-        // Randomly pick a funny coach quote on note misses!
-        const randIndex = Math.floor(Math.random() * FUNNY_COACH_MISS_QUOTES.length);
-        setCoachMsg(FUNNY_COACH_MISS_QUOTES[randIndex]);
-      }
+      const customMsg = message || FUNNY_COACH_MISS_QUOTES[Math.floor(Math.random() * FUNNY_COACH_MISS_QUOTES.length)];
 
-      return nextState;
+      return {
+        ...nextState,
+        coachMsg: customMsg
+      };
     });
   };
 
@@ -145,25 +147,26 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   const handleSongEnd = () => {
     audio.stop();
 
+    const currentState = matchStateRef.current;
     const targetThreshold = Math.round(song.notes.length * 80);
-    setMatchState((prev) => {
-      const isVictory = prev.score >= targetThreshold;
-      
-      if (isVictory) {
-        audio.playSFX('oss');
-        audio.speakCoach(`Time is up! Final score is ${prev.score}, beating the target of ${targetThreshold}. Magnificent submission win!`);
-        setCoachMsg(`Oss! Masterful victory! You beat the target score of ${targetThreshold}!`);
-      } else {
-        audio.playSFX('miss');
-        audio.speakCoach(`Time is up! Final score is ${prev.score}, which was below the target of ${targetThreshold} for a submission win. Train harder!`);
-        setCoachMsg(`Decision Loss: You scored ${prev.score} (needed ${targetThreshold} for submission).`);
-      }
+    const isVictory = currentState.score >= targetThreshold;
+    let finalCoachMsg = '';
 
-      return {
-        ...prev,
-        gameStatus: isVictory ? 'victory' : 'gameover',
-      };
-    });
+    if (isVictory) {
+      audio.playSFX('oss');
+      audio.speakCoach(`Time is up! Final score is ${currentState.score}, beating the target of ${targetThreshold}. Magnificent submission win!`);
+      finalCoachMsg = `Oss! Masterful victory! You beat the target score of ${targetThreshold}!`;
+    } else {
+      audio.playSFX('miss');
+      audio.speakCoach(`Time is up! Final score is ${currentState.score}, which was below the target of ${targetThreshold} for a submission win. Train harder!`);
+      finalCoachMsg = `Decision Loss: You scored ${currentState.score} (needed ${targetThreshold} for submission).`;
+    }
+
+    setMatchState((prev) => ({
+      ...prev,
+      gameStatus: isVictory ? 'victory' : 'gameover',
+      coachMsg: finalCoachMsg,
+    }));
   };
 
   // Virtual mobile touch pad triggers
@@ -187,8 +190,8 @@ export const GameScreen: React.FC<GameScreenProps> = ({
       selectedSongId: song.id,
       calibrationOffset,
       mistakes: 0,
+      coachMsg: "Match restarted! Protect your neck.",
     });
-    setCoachMsg("Match restarted! Protect your neck.");
     song.notes.forEach((n) => {
       n.hit = false;
       n.hitResult = null;

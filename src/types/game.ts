@@ -57,4 +57,6 @@ export interface MatchState {
   selectedSongId: string | null;
   calibrationOffset: number; // in milliseconds (lag adjustment)
   mistakes: number;
+  coachMsg?: string;
 }
+

@@ -142,6 +142,18 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
   const floatingTextsRef = useRef<FloatingText[]>([]);
   const matchStateRef = useRef<MatchState>(matchState);
 
+  const onSongEndRef = useRef(onSongEnd);
+  const onNoteHitRef = useRef(onNoteHit);
+  const onNoteMissRef = useRef(onNoteMiss);
+  const onTriggerMobileTouchRef = useRef(onTriggerMobileTouch);
+
+  useEffect(() => {
+    onSongEndRef.current = onSongEnd;
+    onNoteHitRef.current = onNoteHit;
+    onNoteMissRef.current = onNoteMiss;
+    onTriggerMobileTouchRef.current = onTriggerMobileTouch;
+  }, [onSongEnd, onNoteHit, onNoteMiss, onTriggerMobileTouch]);
+
   // Active inputs tracker (Keyboard and Touch presses)
   const activeKeysRef = useRef<Record<DDRDirection, boolean>>({
     left: false,
@@ -221,7 +233,7 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
 
       if (direction) {
         e.preventDefault();
-        onTriggerMobileTouch(direction); // Flashes virtual buttons
+        onTriggerMobileTouchRef.current(direction); // Flashes virtual buttons
         
         // Prevent keyboard auto-repeat from triggering multiple ghost taps
         if (!activeKeysRef.current[direction]) {
@@ -328,7 +340,7 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       }
 
       note.hitResult = result;
-      onNoteHit(direction, scoreAdd, result);
+      onNoteHitRef.current(direction, scoreAdd, result);
 
       // Trigger visual hit spark text and neon explosion!
       const laneIndex = ['left', 'down', 'up', 'right'].indexOf(direction);
@@ -366,7 +378,7 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       });
     } else {
       // Ghost tap / Miss
-      onNoteMiss();
+      onNoteMissRef.current();
     }
   };
 
@@ -414,7 +426,7 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
           const scoreAdd = success ? 250 : 50;
           const color = success ? 'var(--neon-green)' : 'var(--neon-pink)';
 
-          onNoteHit(note.direction, scoreAdd, result);
+          onNoteHitRef.current(note.direction, scoreAdd, result);
 
           // Spawn a massive final explosion!
           const laneIndex = directions.indexOf(note.direction);
@@ -494,7 +506,7 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
           if (!note.hit && songTime > note.time + gracePeriod) {
             note.hit = true;
             note.hitResult = 'miss';
-            onNoteMiss();
+            onNoteMissRef.current();
 
             const laneIndex = ['left', 'down', 'up', 'right'].indexOf(note.direction);
             const laneWidth = rhythmDim.width / 4;
@@ -515,7 +527,7 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       // ─── 4. Check for Song Completion ───
       if (song && state.gameStatus === 'playing') {
         if (songTime >= song.duration) {
-          onSongEnd();
+          onSongEndRef.current();
         }
       }
 
