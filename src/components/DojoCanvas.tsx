@@ -12,6 +12,7 @@ interface DojoCanvasProps {
   onNoteHit: (direction: DDRDirection, scoreAdd: number, result: 'oss' | 'good' | 'meh') => void;
   onNoteMiss: () => void;
   onTriggerMobileTouch: (direction: DDRDirection) => void;
+  onSongEnd: () => void;
 }
 
 export interface DojoCanvasRef {
@@ -118,6 +119,7 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
   onNoteHit,
   onNoteMiss,
   onTriggerMobileTouch,
+  onSongEnd,
 }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const fighterCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -508,6 +510,13 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
             });
           }
         });
+      }
+
+      // ─── 4. Check for Song Completion ───
+      if (song && state.gameStatus === 'playing') {
+        if (songTime >= song.duration) {
+          onSongEnd();
+        }
       }
 
       animationFrameId = requestAnimationFrame(draw);
@@ -1240,7 +1249,7 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
           zIndex: 5
         }}>
           <div style={{ color: 'var(--text-muted)' }}>POSITION: <span style={{ color: '#fff', fontWeight: 'bold' }}>{getPositionLabel(matchState.position)}</span></div>
-          <div style={{ color: 'var(--text-muted)', marginTop: '4px' }}>SCORE: <span style={{ color: 'var(--neon-yellow)', fontWeight: 'bold' }}>{matchState.score}</span></div>
+          <div style={{ color: 'var(--text-muted)', marginTop: '4px' }}>SCORE: <span style={{ color: 'var(--neon-yellow)', fontWeight: 'bold' }}>{matchState.score}</span> <span style={{ fontSize: '10px', color: '#6b7280' }}>/ {Math.round((song?.notes.length || 0) * 80)} Target</span></div>
           <div style={{ color: 'var(--text-muted)', marginTop: '4px' }}>COMBO: <span style={{ color: 'var(--neon-cyan)', fontWeight: 'bold' }}>{matchState.comboCount}</span></div>
         </div>
 

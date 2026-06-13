@@ -74,11 +74,13 @@ export class GrapplingEngine {
         audio.playSFX('strain');
 
         if (nextState.chokeMeter === 0) {
-          nextState.gameStatus = 'victory';
+          nextState.score += 2000;
           nextState.submission = 'none';
-          message = "OPPONENT TAPPED! Flawless submission! 🏆 Victory!";
+          nextState.position = 'guard'; // Reset to Closed Guard
+          nextState.chokeMeter = 50; // Reset choke meter to neutral
+          message = "OPPONENT TAPPED! Submission Secured! +2000 pts! Recovering Closed Guard!";
           audio.playSFX('tap');
-          audio.speakCoach("He tapped! Beautiful submission! You are a master!");
+          audio.speakCoach("He tapped! Beautiful submission! Keep working!");
         }
       } else {
         // Player is defending a choke! Hitting notes pushes chokeMeter closer to 50 (Escape back to neutral)

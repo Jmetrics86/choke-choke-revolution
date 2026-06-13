@@ -141,6 +141,31 @@ export const GameScreen: React.FC<GameScreenProps> = ({
     });
   };
 
+  // Handle song completion and threshold checks
+  const handleSongEnd = () => {
+    audio.stop();
+
+    const targetThreshold = Math.round(song.notes.length * 80);
+    setMatchState((prev) => {
+      const isVictory = prev.score >= targetThreshold;
+      
+      if (isVictory) {
+        audio.playSFX('oss');
+        audio.speakCoach(`Time is up! Final score is ${prev.score}, beating the target of ${targetThreshold}. Magnificent submission win!`);
+        setCoachMsg(`Oss! Masterful victory! You beat the target score of ${targetThreshold}!`);
+      } else {
+        audio.playSFX('miss');
+        audio.speakCoach(`Time is up! Final score is ${prev.score}, which was below the target of ${targetThreshold} for a submission win. Train harder!`);
+        setCoachMsg(`Decision Loss: You scored ${prev.score} (needed ${targetThreshold} for submission).`);
+      }
+
+      return {
+        ...prev,
+        gameStatus: isVictory ? 'victory' : 'gameover',
+      };
+    });
+  };
+
   // Virtual mobile touch pad triggers
   const handleMobileTouch = (direction: DDRDirection) => {
     setActiveButton(direction);
@@ -171,6 +196,10 @@ export const GameScreen: React.FC<GameScreenProps> = ({
     audio.stop();
     audio.play(song);
   };
+
+  const threshold = Math.round(song.notes.length * 80);
+  const notesHit = song.notes.filter(n => n.hit && n.hitResult && n.hitResult !== 'miss').length;
+  const accuracy = song.notes.length > 0 ? Math.round((notesHit / song.notes.length) * 100) : 0;
 
   return (
     <div className="game-screen-container" style={{ background: '#07080b' }}>
@@ -232,6 +261,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         onNoteHit={handleNoteHit}
         onNoteMiss={handleNoteMiss}
         onTriggerMobileTouch={handleMobileTouch}
+        onSongEnd={handleSongEnd}
       />
 
       {/* ─── MOBILE FRIENDLY TOUCH BUTTONS OVERLAY ─── */}
@@ -289,12 +319,14 @@ export const GameScreen: React.FC<GameScreenProps> = ({
       {/* ─── VICTORY STATE MODAL OVERLAY ─── */}
       {matchState.gameStatus === 'victory' && (
         <div className="overlay-screen">
-          <h2 className="overlay-title victory-title">OPPONENT TAPPED!</h2>
+          <h2 className="overlay-title victory-title">SUBMISSION VICTORY!</h2>
           <p style={{ color: 'var(--neon-green)', fontWeight: 'bold', fontSize: '14px', marginBottom: '20px' }}>
-            Submission Secured. Excellent technique!
+            Congratulations! You beat the target score of {threshold}!
           </p>
-          <div className="overlay-stat">Final Score: <span>{matchState.score}</span></div>
+          <div className="overlay-stat">Final Score: <span>{matchState.score}</span> <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>(Target: {threshold})</span></div>
+          <div className="overlay-stat">Accuracy: <span>{accuracy}%</span> <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>({notesHit}/{song.notes.length} hits)</span></div>
           <div className="overlay-stat">Max Combo: <span>{matchState.maxCombo}</span></div>
+          <div className="overlay-stat">Mistakes: <span>{matchState.mistakes}</span></div>
           <div className="overlay-buttons">
             <button className="arc-btn cyan-btn" onClick={restartMatch}>Grapple Again</button>
             <button className="option-btn" onClick={onExit} style={{ border: '1px solid #4a5568' }}>Return to Dojo</button>
@@ -305,12 +337,28 @@ export const GameScreen: React.FC<GameScreenProps> = ({
       {/* ─── GAMEOVER STATE MODAL OVERLAY ─── */}
       {matchState.gameStatus === 'gameover' && (
         <div className="overlay-screen">
-          <h2 className="overlay-title gameover-title">TAP OUT!</h2>
-          <p style={{ color: 'var(--neon-pink)', fontWeight: 'bold', fontSize: '14px', marginBottom: '20px' }}>
-            The choke was locked deep. Protect your neck!
-          </p>
-          <div className="overlay-stat">Final Score: <span>{matchState.score}</span></div>
-          <div className="overlay-stat">Max Combo: <span>{matchState.maxCombo}</span></div>
+          {matchState.chokeMeter >= 100 ? (
+            <>
+              <h2 className="overlay-title gameover-title">TAP OUT!</h2>
+              <p style={{ color: 'var(--neon-pink)', fontWeight: 'bold', fontSize: '14px', marginBottom: '20px' }}>
+                The choke was locked deep. Protect your neck!
+              </p>
+              <div className="overlay-stat">Final Score: <span>{matchState.score}</span></div>
+              <div className="overlay-stat">Max Combo: <span>{matchState.maxCombo}</span></div>
+              <div className="overlay-stat">Mistakes: <span>{matchState.mistakes}</span></div>
+            </>
+          ) : (
+            <>
+              <h2 className="overlay-title gameover-title">DECISION LOSS</h2>
+              <p style={{ color: 'var(--neon-pink)', fontWeight: 'bold', fontSize: '14px', marginBottom: '20px' }}>
+                Level completed, but score was below target of {threshold} for a submission win.
+              </p>
+              <div className="overlay-stat">Final Score: <span>{matchState.score}</span> <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>(Target: {threshold})</span></div>
+              <div className="overlay-stat">Accuracy: <span>{accuracy}%</span> <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>({notesHit}/{song.notes.length} hits)</span></div>
+              <div className="overlay-stat">Max Combo: <span>{matchState.maxCombo}</span></div>
+              <div className="overlay-stat">Mistakes: <span>{matchState.mistakes}</span></div>
+            </>
+          )}
           <div className="overlay-buttons">
             <button className="arc-btn" onClick={restartMatch}>Retry Match</button>
             <button className="option-btn" onClick={onExit} style={{ border: '1px solid #4a5568' }}>Return to Dojo</button>
