@@ -290,6 +290,7 @@ export class AudioEngine {
         this.loadedAudioBuffer = buffer;
         const source = this.ctx.createBufferSource();
         source.buffer = buffer;
+        source.loop = true;
         source.connect(this.masterGainNode);
         
         // Re-align starting time

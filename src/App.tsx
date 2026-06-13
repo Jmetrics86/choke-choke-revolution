@@ -4,6 +4,7 @@ import { CharacterCustomizer } from './components/CharacterCustomizer';
 import { SongSelector } from './components/SongSelector';
 import { GameScreen } from './components/GameScreen';
 import { Calibration } from './components/Calibration';
+import { LevelCreator } from './components/LevelCreator';
 import { audio } from './utils/AudioEngine';
 import './styles/dojo.css';
 
@@ -16,7 +17,7 @@ const DEFAULT_FIGHTER: FighterStyle = {
 };
 
 export const App: React.FC = () => {
-  const [screen, setScreen] = useState<'menu' | 'customizing' | 'song-select' | 'playing' | 'calibration'>('menu');
+  const [screen, setScreen] = useState<'menu' | 'customizing' | 'song-select' | 'playing' | 'calibration' | 'creator'>('menu');
   const [fighter, setFighter] = useState<FighterStyle>(DEFAULT_FIGHTER);
   const [selectedSong, setSelectedSong] = useState<SongBlueprint | null>(null);
   const [calibrationOffset, setCalibrationOffset] = useState<number>(0);
@@ -101,6 +102,13 @@ export const App: React.FC = () => {
               </button>
               <button 
                 className="arc-btn" 
+                onClick={() => { unlockAudio(); setScreen('creator'); }}
+                style={{ borderColor: 'var(--ui-neon-cyan)' }}
+              >
+                LEVEL CREATOR 🎵
+              </button>
+              <button 
+                className="arc-btn" 
                 onClick={() => { unlockAudio(); setScreen('customizing'); }}
               >
                 CUSTOMIZE FIGHTER
@@ -147,6 +155,14 @@ export const App: React.FC = () => {
               audio.stop();
               setScreen('song-select');
             }}
+          />
+        )}
+
+        {/* TATAMI LEVEL CREATOR */}
+        {screen === 'creator' && (
+          <LevelCreator
+            onPlaySong={handleSelectSong}
+            onBack={() => setScreen('menu')}
           />
         )}
 

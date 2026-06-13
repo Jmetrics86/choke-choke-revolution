@@ -1,0 +1,1668 @@
+{
+  "id": "cli-metal-974",
+  "title": "metal",
+  "genre": "Tatami Beats",
+  "bpm": 120,
+  "duration": 174,
+  "coverArt": "\n    <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\" width=\"100%\" height=\"100%\">\n      <rect x=\"2\" y=\"2\" width=\"196\" height=\"196\" rx=\"10\" fill=\"#12131a\" stroke=\"#1f2937\" stroke-width=\"4\" />\n      <circle cx=\"100\" cy=\"100\" r=\"60\" fill=\"none\" stroke=\"#00f5d4\" stroke-width=\"1.5\" stroke-dasharray=\"5,2\" />\n      <path d=\"M110,120 Q80,110 75,70 Q95,85 110,120\" fill=\"#ffea00\" stroke=\"#ffd60a\" stroke-width=\"2\" />\n      <rect x=\"10\" y=\"155\" width=\"180\" height=\"35\" rx=\"5\" fill=\"#0d0e12\" stroke=\"#1f2937\" stroke-width=\"1\" />\n      <text x=\"100\" y=\"170\" fill=\"#ffffff\" font-size=\"10\" font-family=\"monospace\" font-weight=\"bold\" text-anchor=\"middle\">metal</text>\n      <text x=\"100\" y=\"183\" fill=\"#00f5d4\" font-size=\"7\" font-family=\"monospace\" text-anchor=\"middle\">COMPOSER: GEMINI AI</text>\n    </svg>\n  ",
+  "bassNotes": [
+    "A2",
+    "D2",
+    "E2",
+    "G2"
+  ],
+  "leadNotes": [
+    "A4",
+    "C5",
+    "D5",
+    "E5"
+  ],
+  "notes": [
+    {
+      "id": "note-4-1",
+      "time": 2,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-6-1",
+      "time": 3,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-9-2",
+      "time": 4.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-10-1",
+      "time": 5,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-12-1",
+      "time": 6,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-14-1",
+      "time": 7,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-15-2",
+      "time": 7.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-18-1",
+      "time": 9,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-20-1",
+      "time": 10,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-21-2",
+      "time": 10.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-22-1",
+      "time": 11,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-26-1",
+      "time": 13,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-27-2",
+      "time": 13.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-28-1",
+      "time": 14,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-30-1",
+      "time": 15,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-33-2",
+      "time": 16.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-34-1",
+      "time": 17,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-36-1",
+      "time": 18,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-38-1",
+      "time": 19,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-39-2",
+      "time": 19.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-42-1",
+      "time": 21,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-44-1",
+      "time": 22,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-45-2",
+      "time": 22.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-46-1",
+      "time": 23,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-50-1",
+      "time": 25,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-51-2",
+      "time": 25.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-52-1",
+      "time": 26,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-54-1",
+      "time": 27,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-57-2",
+      "time": 28.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-58-1",
+      "time": 29,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-60-1",
+      "time": 30,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-62-1",
+      "time": 31,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-63-2",
+      "time": 31.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-66-1",
+      "time": 33,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-68-1",
+      "time": 34,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-69-2",
+      "time": 34.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-70-1",
+      "time": 35,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-74-1",
+      "time": 37,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-75-2",
+      "time": 37.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-76-1",
+      "time": 38,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-78-1",
+      "time": 39,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-81-2",
+      "time": 40.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-82-1",
+      "time": 41,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-84-1",
+      "time": 42,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-86-1",
+      "time": 43,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-87-2",
+      "time": 43.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-90-1",
+      "time": 45,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-92-1",
+      "time": 46,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-93-2",
+      "time": 46.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-94-1",
+      "time": 47,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-98-1",
+      "time": 49,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-99-2",
+      "time": 49.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-100-1",
+      "time": 50,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-102-1",
+      "time": 51,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-105-2",
+      "time": 52.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-106-1",
+      "time": 53,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-108-1",
+      "time": 54,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-110-1",
+      "time": 55,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-111-2",
+      "time": 55.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-114-1",
+      "time": 57,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-116-1",
+      "time": 58,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-117-2",
+      "time": 58.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-118-1",
+      "time": 59,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-122-1",
+      "time": 61,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-123-2",
+      "time": 61.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-124-1",
+      "time": 62,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-126-1",
+      "time": 63,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-129-2",
+      "time": 64.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-130-1",
+      "time": 65,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-132-1",
+      "time": 66,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-134-1",
+      "time": 67,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-135-2",
+      "time": 67.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-138-1",
+      "time": 69,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-140-1",
+      "time": 70,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-141-2",
+      "time": 70.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-142-1",
+      "time": 71,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-146-1",
+      "time": 73,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-147-2",
+      "time": 73.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-148-1",
+      "time": 74,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-150-1",
+      "time": 75,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-153-2",
+      "time": 76.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-154-1",
+      "time": 77,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-156-1",
+      "time": 78,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-158-1",
+      "time": 79,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-159-2",
+      "time": 79.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-162-1",
+      "time": 81,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-164-1",
+      "time": 82,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-165-2",
+      "time": 82.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-166-1",
+      "time": 83,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-170-1",
+      "time": 85,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-171-2",
+      "time": 85.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-172-1",
+      "time": 86,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-174-1",
+      "time": 87,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-177-2",
+      "time": 88.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-178-1",
+      "time": 89,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-180-1",
+      "time": 90,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-182-1",
+      "time": 91,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-183-2",
+      "time": 91.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-186-1",
+      "time": 93,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-188-1",
+      "time": 94,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-189-2",
+      "time": 94.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-190-1",
+      "time": 95,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-194-1",
+      "time": 97,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-195-2",
+      "time": 97.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-196-1",
+      "time": 98,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-198-1",
+      "time": 99,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-201-2",
+      "time": 100.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-202-1",
+      "time": 101,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-204-1",
+      "time": 102,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-206-1",
+      "time": 103,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-207-2",
+      "time": 103.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-210-1",
+      "time": 105,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-212-1",
+      "time": 106,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-213-2",
+      "time": 106.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-214-1",
+      "time": 107,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-218-1",
+      "time": 109,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-219-2",
+      "time": 109.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-220-1",
+      "time": 110,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-222-1",
+      "time": 111,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-225-2",
+      "time": 112.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-226-1",
+      "time": 113,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-228-1",
+      "time": 114,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-230-1",
+      "time": 115,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-231-2",
+      "time": 115.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-234-1",
+      "time": 117,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-236-1",
+      "time": 118,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-237-2",
+      "time": 118.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-238-1",
+      "time": 119,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-242-1",
+      "time": 121,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-243-2",
+      "time": 121.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-244-1",
+      "time": 122,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-246-1",
+      "time": 123,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-249-2",
+      "time": 124.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-250-1",
+      "time": 125,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-252-1",
+      "time": 126,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-254-1",
+      "time": 127,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-255-2",
+      "time": 127.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-258-1",
+      "time": 129,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-260-1",
+      "time": 130,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-261-2",
+      "time": 130.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-262-1",
+      "time": 131,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-266-1",
+      "time": 133,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-267-2",
+      "time": 133.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-268-1",
+      "time": 134,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-270-1",
+      "time": 135,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-273-2",
+      "time": 136.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-274-1",
+      "time": 137,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-276-1",
+      "time": 138,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-278-1",
+      "time": 139,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-279-2",
+      "time": 139.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-282-1",
+      "time": 141,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-284-1",
+      "time": 142,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-285-2",
+      "time": 142.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-286-1",
+      "time": 143,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-290-1",
+      "time": 145,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-291-2",
+      "time": 145.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-292-1",
+      "time": 146,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-294-1",
+      "time": 147,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-297-2",
+      "time": 148.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-298-1",
+      "time": 149,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-300-1",
+      "time": 150,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-302-1",
+      "time": 151,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-303-2",
+      "time": 151.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-306-1",
+      "time": 153,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-308-1",
+      "time": 154,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-309-2",
+      "time": 154.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-310-1",
+      "time": 155,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-314-1",
+      "time": 157,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-315-2",
+      "time": 157.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-316-1",
+      "time": 158,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-318-1",
+      "time": 159,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-321-2",
+      "time": 160.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-322-1",
+      "time": 161,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-324-1",
+      "time": 162,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-326-1",
+      "time": 163,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-327-2",
+      "time": 163.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-330-1",
+      "time": 165,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    },
+    {
+      "id": "note-332-1",
+      "time": 166,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-333-2",
+      "time": 166.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-334-1",
+      "time": 167,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-338-1",
+      "time": 169,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-339-2",
+      "time": 169.5,
+      "direction": "right",
+      "action": "sweep",
+      "hit": false,
+      "hitResult": null
+    },
+    {
+      "id": "note-340-1",
+      "time": 170,
+      "direction": "down",
+      "action": "sprawl",
+      "hit": false,
+      "hitResult": null,
+      "isHold": false
+    },
+    {
+      "id": "note-342-1",
+      "time": 171,
+      "direction": "up",
+      "action": "posture",
+      "hit": false,
+      "hitResult": null,
+      "isHold": true,
+      "holdDuration": 0.75
+    }
+  ],
+  "audioUrl": "/tracks/metal.mp3",
+  "beltColor": "blue",
+  "isCustom": true
+}
