@@ -151,6 +151,7 @@ export class GrapplingEngine {
   // Handles Note MISSES (Moves chokeMeter towards 100 / triggers Opponent attacks)
   public registerMiss(currentState: MatchState): { nextState: MatchState; message: string | null } {
     const nextState = { ...currentState };
+    nextState.mistakes = (nextState.mistakes || 0) + 1;
     let message: string | null = null;
 
     // A miss always pushes the Choke Meter closer to 100 (Defeat)

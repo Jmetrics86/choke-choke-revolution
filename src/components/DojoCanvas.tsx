@@ -2,10 +2,13 @@ import { useRef, useEffect, useState, useImperativeHandle, forwardRef } from 're
 import { SongBlueprint, FighterStyle, MatchState, DDRDirection } from '../types/game';
 import { audio } from '../utils/AudioEngine';
 
+const SCROLL_SPEED = 330; // pixels per second
+
 interface DojoCanvasProps {
   song: SongBlueprint | null;
   fighter: FighterStyle;
   matchState: MatchState;
+  coachMsg: string;
   onNoteHit: (direction: DDRDirection, scoreAdd: number, result: 'oss' | 'good' | 'meh') => void;
   onNoteMiss: () => void;
   onTriggerMobileTouch: (direction: DDRDirection) => void;
@@ -36,12 +39,82 @@ interface HitParticle {
   opacity: number;
 }
 
+interface NoteFlash {
+  x: number;
+  y: number;
+  direction: DDRDirection;
+  isRainbow: boolean;
+  opacity: number;
+  scale: number;
+  birthTime: number;
+}
+
 const getTargetY = (h: number) => h > 350 ? h - 110 : h - 75;
+
+// Scalable Vector BJJ Coach Banana Component
+const BJJCoachBanana: React.FC = () => {
+  return (
+    <svg width="100%" height="100%" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+      {/* Green Top Stem */}
+      <path d="M 45 10 C 44 5, 46 2, 48 2 C 50 2, 50 5, 47 10 Z" fill="#70e000" stroke="#38b000" strokeWidth="1.5" />
+      
+      {/* Curved Banana Body */}
+      <path d="M 45 10 C 38 12, 28 35, 30 75 C 32 100, 42 115, 55 115 C 65 115, 62 100, 58 75 C 54 35, 50 12, 45 10 Z" fill="#ffca3a" stroke="#f4a261" strokeWidth="2" />
+      
+      {/* Brown Bottom Tip */}
+      <path d="M 54.5 113.5 C 53.5 116, 51.5 117.5, 49.5 117.5 C 47.5 117.5, 46.5 116, 48.5 113.5 Z" fill="#4a3728" />
+
+      {/* Grumpy Mouth */}
+      <path d="M 47 50 Q 50 47 53 50" fill="none" stroke="#4a3728" strokeWidth="1.5" strokeLinecap="round" />
+
+      {/* White Gi Jacket */}
+      <path d="M 32 55 L 68 55 L 68 95 L 32 95 Z" fill="#ffffff" stroke="#cbd5e1" strokeWidth="1.5" />
+      
+      {/* Left Collar Wrap */}
+      <path d="M 32 55 C 38 60, 48 70, 48 95" fill="none" stroke="#e2e8f0" strokeWidth="4" />
+      
+      {/* Right Collar Wrap */}
+      <path d="M 68 55 C 62 60, 52 70, 52 95" fill="none" stroke="#cbd5e1" strokeWidth="4" />
+      
+      {/* Crossed Sleeve Left */}
+      <path d="M 32 58 C 36 68, 44 72, 50 72" fill="none" stroke="#ffffff" strokeWidth="6" strokeLinecap="round" />
+      <path d="M 32 58 C 36 68, 44 72, 50 72" fill="none" stroke="#cbd5e1" strokeWidth="1.5" strokeLinecap="round" />
+      
+      {/* Crossed Sleeve Right */}
+      <path d="M 68 58 C 64 68, 56 72, 50 72" fill="none" stroke="#ffffff" strokeWidth="6" strokeLinecap="round" />
+      <path d="M 68 58 C 64 68, 56 72, 50 72" fill="none" stroke="#cbd5e1" strokeWidth="1.5" strokeLinecap="round" />
+
+      {/* BJJ Black Belt (y=78) */}
+      <rect x="31" y="78" width="38" height="8" rx="2" fill="#1a1a1a" stroke="#000000" strokeWidth="1" />
+      
+      {/* Belt Knot */}
+      <rect x="46" y="76" width="8" height="12" rx="1" fill="#2d3748" />
+      
+      {/* Dangling Ends */}
+      <path d="M 48 84 L 42 98 L 46 99 L 50 85 Z" fill="#1a1a1a" />
+      <path d="M 52 84 L 58 100 L 62 99 L 54 85 Z" fill="#1a1a1a" />
+      
+      {/* Red Ranking sleeve bar */}
+      <path d="M 56.5 92 L 58.5 97 L 60.5 96.5 L 58.5 91.5 Z" fill="#ef4444" />
+      
+      {/* White Stripe detail */}
+      <path d="M 58 96 L 58.5 97.5 L 59.5 97.2 L 59 95.7 Z" fill="#ffffff" />
+
+      {/* Retro Pink Neon Sunglasses */}
+      <ellipse cx="42" cy="40" rx="7" ry="4.5" fill="#111111" stroke="#ff0055" strokeWidth="2" />
+      <ellipse cx="58" cy="40" rx="7" ry="4.5" fill="#111111" stroke="#ff0055" strokeWidth="2" />
+      <path d="M 49 39 L 51 39" fill="none" stroke="#ff0055" strokeWidth="2" />
+      <path d="M 35 40 L 32 38" fill="none" stroke="#ff0055" strokeWidth="1.5" />
+      <path d="M 65 40 L 68 38" fill="none" stroke="#ff0055" strokeWidth="1.5" />
+    </svg>
+  );
+};
 
 export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
   song,
   fighter,
   matchState,
+  coachMsg,
   onNoteHit,
   onNoteMiss,
   onTriggerMobileTouch,
@@ -52,6 +125,17 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
 
   const [fighterDim, setFighterDim] = useState({ width: 400, height: 250 });
   const [rhythmDim, setRhythmDim] = useState({ width: 380, height: 500 });
+  const [bubbleVisible, setBubbleVisible] = useState(true);
+
+  useEffect(() => {
+    if (coachMsg) {
+      setBubbleVisible(true);
+      const timer = setTimeout(() => {
+        setBubbleVisible(false);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [coachMsg]);
   
   const floatingTextsRef = useRef<FloatingText[]>([]);
   const matchStateRef = useRef<MatchState>(matchState);
@@ -66,6 +150,9 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
 
   // Particle list reference for visual spark explosions
   const particlesRef = useRef<HitParticle[]>([]);
+
+  // Note flash reference for hit feedback animation
+  const noteFlashesRef = useRef<NoteFlash[]>([]);
 
   // Keep latest state in ref to avoid re-binding loops
   useEffect(() => {
@@ -163,16 +250,19 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
   }, [song, rhythmDim]);
 
   // Spawn visual particle explosions on successful hits
-  const spawnHitExplosion = (x: number, y: number, color: string) => {
-    for (let i = 0; i < 16; i++) {
+  const spawnHitExplosion = (x: number, y: number, color: string, isRainbow = false) => {
+    const rainbowColors = ['#ff0055', '#ffea00', '#39ff14', '#00f5d4', '#7209b7'];
+    const count = isRainbow ? 20 : 16;
+    for (let i = 0; i < count; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const speed = 1.8 + Math.random() * 4.0;
+      const speed = isRainbow ? (2.0 + Math.random() * 4.5) : (1.8 + Math.random() * 4.0);
+      const particleColor = isRainbow ? rainbowColors[Math.floor(Math.random() * rainbowColors.length)] : color;
       particlesRef.current.push({
         x,
         y,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
-        color,
+        color: particleColor,
         size: 3 + Math.random() * 4,
         opacity: 1.0,
       });
@@ -243,7 +333,26 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       const laneWidth = rhythmDim.width / 4;
       const x = laneIndex * laneWidth + laneWidth / 2;
 
-      spawnHitExplosion(x, targetY, ['var(--neon-pink)', 'var(--neon-cyan)', 'var(--neon-green)', 'var(--neon-yellow)'][laneIndex]);
+      // Calculate exact Y of the note when hit
+      const hitY = targetY - (note.time - songTime) * SCROLL_SPEED;
+
+      // Add note flash effect
+      noteFlashesRef.current.push({
+        x,
+        y: hitY,
+        direction,
+        isRainbow: result === 'oss',
+        opacity: 1.0,
+        scale: 1.0,
+        birthTime: songTime,
+      });
+
+      spawnHitExplosion(
+        x,
+        targetY,
+        ['var(--neon-pink)', 'var(--neon-cyan)', 'var(--neon-green)', 'var(--neon-yellow)'][laneIndex],
+        result === 'oss'
+      );
 
       floatingTextsRef.current.push({
         text: result === 'oss' ? 'OSS!' : result.toUpperCase(),
@@ -366,6 +475,7 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
       rCtx.fillRect(0, 0, rhythmDim.width, rhythmDim.height);
       drawRhythmHighway(rCtx, songTime, rhythmDim.width, rhythmDim.height);
       updateAndDrawParticles(rCtx);
+      updateAndDrawNoteFlashes(rCtx, songTime);
       drawFloatingTexts(rCtx);
 
       // Process Hold Notes hold-state scoring
@@ -432,6 +542,90 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
 
     // Clean dead particles
     particlesRef.current = particlesRef.current.filter((p) => p.opacity > 0 && p.size > 0.1);
+    ctx.restore();
+  };
+
+  // Update and draw note flashes (snappy white/rainbow feedback)
+  const updateAndDrawNoteFlashes = (ctx: CanvasRenderingContext2D, songTime: number) => {
+    ctx.save();
+    noteFlashesRef.current.forEach((flash) => {
+      const elapsed = songTime - flash.birthTime;
+      const duration = 0.12; // Snappy 120ms animation
+      const progress = elapsed / duration;
+
+      if (progress >= 1) {
+        flash.opacity = 0;
+        return;
+      }
+
+      flash.opacity = 1 - progress;
+      flash.scale = 1.0 + progress * 0.3; // Grows slightly
+
+      const { x, y, direction, isRainbow, opacity, scale } = flash;
+      const laneIndex = ['left', 'down', 'up', 'right'].indexOf(direction);
+      const icons = ['←', '↓', '↑', '→'];
+
+      ctx.save();
+      ctx.globalAlpha = opacity;
+
+      if (isRainbow) {
+        // Radial rainbow glow behind the flash
+        const radius = 35 * scale;
+        const grad = ctx.createRadialGradient(x, y, 2, x, y, radius);
+        grad.addColorStop(0, '#ffffff');
+        grad.addColorStop(0.2, '#ff0055'); // neon pink
+        grad.addColorStop(0.4, '#ffea00'); // neon yellow
+        grad.addColorStop(0.6, '#39ff14'); // neon green
+        grad.addColorStop(0.8, '#00f5d4'); // neon cyan
+        grad.addColorStop(1.0, 'transparent');
+
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Rainbow linear gradient border on the block itself
+        const borderGrad = ctx.createLinearGradient(x - 18 * scale, y - 18 * scale, x + 18 * scale, y + 18 * scale);
+        borderGrad.addColorStop(0, '#ff0055');
+        borderGrad.addColorStop(0.25, '#ffea00');
+        borderGrad.addColorStop(0.5, '#39ff14');
+        borderGrad.addColorStop(0.75, '#00f5d4');
+        borderGrad.addColorStop(1.0, '#7209b7');
+
+        ctx.strokeStyle = borderGrad;
+        ctx.lineWidth = 3.0;
+        ctx.fillStyle = '#ffffff'; // White inner core flash
+
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = '#ffffff';
+
+        ctx.fillRect(x - 18 * scale, y - 18 * scale, 36 * scale, 36 * scale);
+        ctx.strokeRect(x - 18 * scale, y - 18 * scale, 36 * scale, 36 * scale);
+      } else {
+        // Normal white flash
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2.0;
+
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = '#ffffff';
+
+        ctx.fillRect(x - 18 * scale, y - 18 * scale, 36 * scale, 36 * scale);
+        ctx.strokeRect(x - 18 * scale, y - 18 * scale, 36 * scale, 36 * scale);
+      }
+
+      // Draw arrow icon inside the flash (black color for contrast)
+      ctx.fillStyle = '#000000';
+      ctx.font = `bold ${Math.floor(20 * scale)}px monospace`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(icons[laneIndex], x, y);
+
+      ctx.restore();
+    });
+
+    // Clean up dead flashes
+    noteFlashesRef.current = noteFlashesRef.current.filter((f) => f.opacity > 0);
     ctx.restore();
   };
 
@@ -861,8 +1055,6 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
 
     // Draw SCROLLING NOTES (tails first so they render under the arrow heads!)
     if (song && matchStateRef.current.gameStatus === 'playing') {
-      const scrollSpeed = 330; // pixels per second
-
       song.notes.forEach((note) => {
         const laneIndex = directions.indexOf(note.direction);
         const x = laneIndex * laneWidth + laneWidth / 2;
@@ -872,8 +1064,8 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
 
           if (songTime < holdEnd) {
             // Draw the hold tail body stretching upwards!
-            const headY = targetY - (note.time - songTime) * scrollSpeed;
-            const tailY = targetY - (holdEnd - songTime) * scrollSpeed;
+            const headY = targetY - (note.time - songTime) * SCROLL_SPEED;
+            const tailY = targetY - (holdEnd - songTime) * SCROLL_SPEED;
 
             // Pin tail start to targets if actively held, otherwise float on the head
             const startY = note.hit ? targetY : headY;
@@ -909,7 +1101,7 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
         if (note.hit) return;
 
         const timeDiff = note.time - songTime;
-        const y = targetY - timeDiff * scrollSpeed;
+        const y = targetY - timeDiff * SCROLL_SPEED;
 
         if (y < -30 || y > height) return;
 
@@ -1050,6 +1242,46 @@ export const DojoCanvas = forwardRef<DojoCanvasRef, DojoCanvasProps>(({
           <div style={{ color: 'var(--text-muted)' }}>POSITION: <span style={{ color: '#fff', fontWeight: 'bold' }}>{getPositionLabel(matchState.position)}</span></div>
           <div style={{ color: 'var(--text-muted)', marginTop: '4px' }}>SCORE: <span style={{ color: 'var(--neon-yellow)', fontWeight: 'bold' }}>{matchState.score}</span></div>
           <div style={{ color: 'var(--text-muted)', marginTop: '4px' }}>COMBO: <span style={{ color: 'var(--neon-cyan)', fontWeight: 'bold' }}>{matchState.comboCount}</span></div>
+        </div>
+
+        {/* Mistakes counter overlay */}
+        {matchState.mistakes > 0 && (
+          <div 
+            key={matchState.mistakes}
+            style={{
+              position: 'absolute',
+              top: '15px',
+              right: '15px',
+              background: 'rgba(255, 0, 85, 0.15)',
+              padding: '8px 12px',
+              borderRadius: '6px',
+              border: '1px solid #ff0055',
+              fontSize: '12px',
+              fontWeight: 'bold',
+              color: '#ff0055',
+              boxShadow: '0 0 10px rgba(255, 0, 85, 0.3)',
+              zIndex: 5,
+              pointerEvents: 'none',
+              animation: 'error-bounce 0.3s ease-out'
+            }}
+          >
+            ⚠️ MISTAKES: {matchState.mistakes}
+          </div>
+        )}
+
+        {/* ─── BJJ BLACK BELT COACH BANANA OVERLAY ─── */}
+        <div className="bjj-coach-overlay">
+          {coachMsg && bubbleVisible && (
+            <div className="coach-speech-bubble-wrapper" key={coachMsg}>
+              <div className="coach-speech-bubble">
+                {coachMsg}
+              </div>
+              <div className="coach-speech-bubble-arrow" />
+            </div>
+          )}
+          <div className="coach-character-wrapper">
+            <BJJCoachBanana />
+          </div>
         </div>
       </div>
 

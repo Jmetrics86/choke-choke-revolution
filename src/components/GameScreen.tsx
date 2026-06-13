@@ -11,6 +11,27 @@ interface GameScreenProps {
   calibrationOffset: number;
 }
 
+const FUNNY_COACH_MISS_QUOTES = [
+  "Wrong arm!",
+  "Your other left!",
+  "Shrimp! Don't just lay there!",
+  "Elbows in! Protect your neck!",
+  "He's passing! Underhook!",
+  "Frame! Frame! Don't get flattened!",
+  "Watch out for the armbar!",
+  "Stop staring at me, watch your posture!",
+  "Where is your posture?!",
+  "You're giving him the sweep!",
+  "He's setting up the triangle!",
+  "Don't give him your arm!",
+  "Heavy hips! Sprawl!",
+  "Oops, too late! Move your hips!",
+  "Underhook! Underhook! Where is it?!",
+  "Protect the neck! Protect the neck!",
+  "You're falling asleep! Shrimp!",
+  "Stop trying to use strength, use technique!"
+];
+
 export const GameScreen: React.FC<GameScreenProps> = ({
   song,
   fighter,
@@ -29,11 +50,22 @@ export const GameScreen: React.FC<GameScreenProps> = ({
     gameStatus: 'playing',
     selectedSongId: song.id,
     calibrationOffset,
+    mistakes: 0,
   });
 
   const [coachMsg, setCoachMsg] = useState<string>("Breathe. Frame. Watch his posture.");
   const [activeButton, setActiveButton] = useState<DDRDirection | null>(null);
   const canvasRef = useRef<DojoCanvasRef>(null);
+
+  // Subscribe to Audio Engine Coach Speech events to update UI bubble
+  useEffect(() => {
+    const unsubscribe = audio.subscribeCoach((msg) => {
+      setCoachMsg(msg);
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   // Start synthesizing the song when screen loads
   useEffect(() => {
@@ -99,6 +131,10 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
       if (message) {
         setCoachMsg(message);
+      } else {
+        // Randomly pick a funny coach quote on note misses!
+        const randIndex = Math.floor(Math.random() * FUNNY_COACH_MISS_QUOTES.length);
+        setCoachMsg(FUNNY_COACH_MISS_QUOTES[randIndex]);
       }
 
       return nextState;
@@ -125,6 +161,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
       gameStatus: 'playing',
       selectedSongId: song.id,
       calibrationOffset,
+      mistakes: 0,
     });
     setCoachMsg("Match restarted! Protect your neck.");
     song.notes.forEach((n) => {
@@ -191,6 +228,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         song={song}
         fighter={fighter}
         matchState={matchState}
+        coachMsg={coachMsg}
         onNoteHit={handleNoteHit}
         onNoteMiss={handleNoteMiss}
         onTriggerMobileTouch={handleMobileTouch}

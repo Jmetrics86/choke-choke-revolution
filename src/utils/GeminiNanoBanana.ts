@@ -69,6 +69,15 @@ export function generateBeatmap(bpm: number, duration: number, style: string): B
           hit: false,
           hitResult: null,
         });
+      } else if (beat % 4 === 2) {
+        notes.push({
+          id: `note-${beat}-f4`,
+          time: Number(time.toFixed(3)),
+          direction: 'up', // Posture on the upbeat
+          action: 'posture',
+          hit: false,
+          hitResult: null,
+        });
       } else if (beat % 4 === 2.5 || beat % 4 === 3) {
         const offTime = time;
         notes.push({

@@ -30,6 +30,16 @@ export class AudioEngine {
   // Customizer Volume Control
   private masterGainNode: GainNode | null = null;
 
+  // Coach listeners for visual bubble updates
+  private coachListeners: ((text: string) => void)[] = [];
+
+  public subscribeCoach(listener: (text: string) => void): () => void {
+    this.coachListeners.push(listener);
+    return () => {
+      this.coachListeners = this.coachListeners.filter(l => l !== listener);
+    };
+  }
+
   constructor() {
     // We defer context creation until user tap to play nicely with Chrome/Safari mobile auto-block policy
   }
@@ -448,6 +458,17 @@ export class AudioEngine {
 
   // Speaks dojo feedback (Dynamic Coach commentary) using Web Speech API
   public speakCoach(text: string) {
+    // Notify visual UI listeners
+    this.coachListeners.forEach(listener => {
+      try {
+        listener(text);
+      } catch (err) {
+        console.error("Error in coach listener:", err);
+      }
+    });
+
+    // We silence the spoken speech feedback to avoid distracting from the music
+    /*
     if (!('speechSynthesis' in window)) return;
     
     // Stop any current coach talking first to prevent overlapping
@@ -467,6 +488,7 @@ export class AudioEngine {
     }
 
     window.speechSynthesis.speak(utterance);
+    */
   }
 }
 

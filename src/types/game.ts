@@ -56,4 +56,5 @@ export interface MatchState {
   gameStatus: 'menu' | 'customizing' | 'playing' | 'gameover' | 'victory' | 'calibration';
   selectedSongId: string | null;
   calibrationOffset: number; // in milliseconds (lag adjustment)
+  mistakes: number;
 }
