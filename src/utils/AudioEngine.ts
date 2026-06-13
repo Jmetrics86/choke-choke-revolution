@@ -260,7 +260,9 @@ export class AudioEngine {
   // Helper to fetch and decode MP3 files
   private async loadAudioFile(url: string): Promise<AudioBuffer> {
     if (!this.ctx) throw new Error("AudioContext not initialized");
-    const response = await fetch(url);
+    // Add cache-busting timestamp to bypass stale browser cache (skip local blob URLs)
+    const fetchUrl = url.startsWith('blob:') ? url : `${url}?v=${Date.now()}`;
+    const response = await fetch(fetchUrl);
     const arrayBuffer = await response.arrayBuffer();
     return await this.ctx.decodeAudioData(arrayBuffer);
   }

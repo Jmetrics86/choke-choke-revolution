@@ -320,7 +320,7 @@ export const LevelCreator: React.FC<LevelCreatorProps> = ({ onPlaySong, onBack }
       ...previewSong,
       beltColor: beltColor,
       isCustom: true,
-      audioUrl: `/tracks/${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}.mp3` // suggested placement
+      audioUrl: `tracks/${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}.mp3` // suggested placement
     };
     
     const jsonString = JSON.stringify(exportData, null, 2);
